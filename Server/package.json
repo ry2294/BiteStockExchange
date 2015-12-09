@@ -1,0 +1,14 @@
+{
+  "name": "microservice_project",
+  "main": "gateway.js",
+  "dependencies": {
+    "async": "*",
+    "body-parser": "~1.0.1",
+    "express": "~4.0.0",
+    "fb": "^0.7.3",
+    "http": "*",
+    "pg": "*",
+    "request": "*",
+    "url": "*"
+  }
+}
