@@ -39,6 +39,13 @@ public class DataFactory {
     }
 
     private DataFactory() {
+        menuItemHashMap.put("Appetizer", new MenuItem("1", "Chilli Chicken", 10, 15, "Appetizer"));
+
+        menuItemHashMap.put("Soups", new MenuItem("1", "Corn Soup", 7, 9, "Soups"));
+
+        menuItemHashMap.put("Main Course", new MenuItem("1", "Rice with Beans", 15, 20, "Main Course"));
+
+        menuItemHashMap.put("Desserts", new MenuItem("1", "Vanilla", 5, 10, "Desserts"));
     }
 
     public static ArrayList<MenuItem> getMenuForCategory(String category) {
