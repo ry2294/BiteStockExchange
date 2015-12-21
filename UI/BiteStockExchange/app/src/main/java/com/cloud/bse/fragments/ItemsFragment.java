@@ -24,6 +24,7 @@ import java.util.ArrayList;
  */
 public class ItemsFragment extends Fragment {
     private ArrayList<MenuItem> menuItems;
+    private String title;
     private ItemsAdapter itemsAdapter;
     private ListView itemsListView;
 
@@ -32,12 +33,14 @@ public class ItemsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         menuItems = (ArrayList<MenuItem>) args.getSerializable("menuItems");
+        title = (String) args.getSerializable("title");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_items, container, false);
 
+        ((TextView) view.findViewById(R.id.menu_items_title)).setText(title);
         itemsListView = (ListView) view.findViewById(R.id.items_list_view);
         itemsAdapter = new ItemsAdapter(menuItems);
         itemsListView.setAdapter(itemsAdapter);
@@ -46,8 +49,7 @@ public class ItemsFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         MenuItem menuItem = itemsAdapter.getItem(position);
-                        DataFactory.addItemToOrder(menuItem.getItemId(), menuItem.getItemName(), 1, menuItem.getActualPrice());
-                        Toast.makeText(getActivity(), "Item Added to Kart", Toast.LENGTH_LONG);
+                        DataFactory.addItemToOrder(menuItem.getItemId(), menuItem.getItemName(), 1, menuItem.getActualPrice(), getActivity());
                     }
                 }
         );

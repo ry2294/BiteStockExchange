@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.cloud.bse.fragments.FriendActivityFragment;
+import com.cloud.bse.fragments.ItemsFragment;
 import com.cloud.bse.fragments.MenuFragment;
 import com.cloud.bse.fragments.OrderSummaryFragment;
 import com.cloud.bse.model.OrderSummaryItem;
@@ -44,8 +45,10 @@ public class NavigationActivity extends AppCompatActivity
         FragmentManager fm = getSupportFragmentManager();
         Fragment contentFragment = fm.findFragmentById(R.id.navigation_container);
         if(contentFragment == null) {
-            contentFragment = menuFragment;
+            contentFragment = new ItemsFragment();
             Bundle args = new Bundle();
+            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Appetizer"));
+            args.putSerializable("title", "Appetizer");
             contentFragment.setArguments(args);
             fm.beginTransaction()
                     .add(R.id.navigation_container, contentFragment)
@@ -91,10 +94,45 @@ public class NavigationActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_menu) {
+        if (id == R.id.nav_appetizers) {
             // Handle the menu
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.navigation_container, menuFragment);
+            Fragment fragment = new ItemsFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Appetizer"));
+            args.putSerializable("title", "Appetizer");
+            fragment.setArguments(args);
+            transaction.replace(R.id.navigation_container, fragment);
+            transaction.commit();
+        } else if (id == R.id.nav_soups) {
+            // Handle the menu
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            Fragment fragment = new ItemsFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Soups"));
+            args.putSerializable("title", "Soups");
+            fragment.setArguments(args);
+            transaction.replace(R.id.navigation_container, fragment);
+            transaction.commit();
+        } else if (id == R.id.nav_maincourse) {
+            // Handle the menu
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            Fragment fragment = new ItemsFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Main Course"));
+            args.putSerializable("title", "Main Course");
+            fragment.setArguments(args);
+            transaction.replace(R.id.navigation_container, fragment);
+            transaction.commit();
+        } else if (id == R.id.nav_desserts) {
+            // Handle the menu
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            Fragment fragment = new ItemsFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Desserts"));
+            args.putSerializable("title", "Desserts");
+            fragment.setArguments(args);
+            transaction.replace(R.id.navigation_container, fragment);
             transaction.commit();
         } else if (id == R.id.nav_order_summary) {
             Fragment fragment = new OrderSummaryFragment();

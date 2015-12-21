@@ -1,6 +1,8 @@
 package com.cloud.bse;
 
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.cloud.bse.model.MenuItem;
 import com.cloud.bse.model.OrderSummaryItem;
@@ -33,6 +35,9 @@ public class DataFactory {
     private static String user_id;
     private static String user_name;
     private static String fb_token;
+    private static String topic;
+    private static boolean inner = false;
+    private static boolean outer = false;
 
     public static DataFactory getInstance() {
         return ourInstance;
@@ -41,11 +46,35 @@ public class DataFactory {
     private DataFactory() {
         menuItemHashMap.put("Appetizer", new MenuItem("1", "Chilli Chicken", 10, 15, "Appetizer"));
 
-        menuItemHashMap.put("Soups", new MenuItem("1", "Corn Soup", 7, 9, "Soups"));
+        menuItemHashMap.put("Soups", new MenuItem("2", "Corn Soup", 7, 9, "Soups"));
 
-        menuItemHashMap.put("Main Course", new MenuItem("1", "Rice with Beans", 15, 20, "Main Course"));
+        menuItemHashMap.put("Main Course", new MenuItem("3", "Rice with Beans", 15, 20, "Main Course"));
 
-        menuItemHashMap.put("Desserts", new MenuItem("1", "Vanilla", 5, 10, "Desserts"));
+        menuItemHashMap.put("Desserts", new MenuItem("4", "Vanilla", 5, 10, "Desserts"));
+    }
+
+    public static void setTopic (String topic) {
+        DataFactory.topic = topic;
+    }
+
+    public static String getTopic() {
+        return topic;
+    }
+
+    public static boolean isInner() {
+        return inner;
+    }
+
+    public static boolean isOuter() {
+        return outer;
+    }
+
+    public static void setInner(boolean inner) {
+        DataFactory.inner = inner;
+    }
+
+    public static void setOuter(boolean outer) {
+        DataFactory.outer = outer;
     }
 
     public static ArrayList<MenuItem> getMenuForCategory(String category) {
@@ -57,9 +86,13 @@ public class DataFactory {
         return items;
     }
 
-    public static void addItemToOrder(String itemId, String itemName, int itemPrice, int quantity) {
-        if(!orderSummaryItemHashMap.containsKey(itemId))
+    public static void addItemToOrder(String itemId, String itemName, int itemPrice, int quantity, FragmentActivity fragmentActivity) {
+        if(!orderSummaryItemHashMap.containsKey(itemId)) {
+            Toast.makeText(fragmentActivity, "Item added to Kart", Toast.LENGTH_SHORT).show();
             orderSummaryItemHashMap.put(itemId, new OrderSummaryItem(itemId, itemName, itemPrice, quantity));
+        } else {
+            Toast.makeText(fragmentActivity, "Item already added to Kart", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static void addQuantity(String itemId) {

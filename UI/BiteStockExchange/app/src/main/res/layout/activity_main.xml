@@ -5,6 +5,7 @@
     >
 
     <TextView
+        android:text="Info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/info"
@@ -12,6 +13,40 @@
         android:layout_alignParentTop="true"
         android:textSize="18sp"
         />
+
+    <TextView
+        android:text="Latitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/latitude_text"
+        android:layout_below="@+id/info"
+        android:textSize="18sp"
+        />
+
+    <TextView
+        android:text="Longitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/longitude_text"
+        android:layout_below="@+id/latitude_text"
+        android:textSize="18sp"
+        />
+
+    <TextView
+        android:text="GCM Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/gcm_text"
+        android:layout_below="@+id/longitude_text"
+        android:textSize="18sp"
+        />
+
+    <Button
+        android:text="Start App"
+        android:id="@+id/start_app_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/gcm_text"/>
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/login_button"
