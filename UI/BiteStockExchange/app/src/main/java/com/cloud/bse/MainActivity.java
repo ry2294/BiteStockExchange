@@ -93,7 +93,10 @@ public class MainActivity extends AppCompatActivity
                 profile = currentProfile;
                 invokeGCM(profile != null ? profile.getId() : "global");
                 info.setText(info.getText().toString() + " profile = " + (profile != null ? profile.getName() : "null"));
-                // InvokeNavigation();
+                if(profile != null) {
+                    DataFactory.setUserInfo(profile.getId(), profile.getName());
+                    InvokeNavigation();
+                }
             }
         };
 
@@ -112,8 +115,7 @@ public class MainActivity extends AppCompatActivity
                 accessToken = AccessToken.getCurrentAccessToken();
                 profile = Profile.getCurrentProfile();
                 info.setText("access Token = " + (accessToken != null ? accessToken.getUserId() : null));
-                // DataFactory.setUserInfo(loginResult.getAccessToken().getUserId(), "Rakesh Yarlagadda",
-                // loginResult.getAccessToken().getToken());
+                DataFactory.setFb_token(loginResult.getAccessToken().getToken());
                 // RegisterUser registerUser = new RegisterUser();
                 // registerUser.execute();
             }
@@ -130,7 +132,8 @@ public class MainActivity extends AppCompatActivity
         });
 
         if(profile != null) {
-            // InvokeNavigation();
+            InvokeNavigation();
+            DataFactory.setUserInfo(profile.getId(), profile.getName());
         }
 
         mGeofenceList.add(new Geofence.Builder()

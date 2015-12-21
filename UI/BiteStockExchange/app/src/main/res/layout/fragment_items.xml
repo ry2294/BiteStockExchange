@@ -12,6 +12,39 @@
         android:layout_height="wrap_content"
         android:textSize="30dp"/>
 
+    <LinearLayout
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp">
+        <TextView
+            android:text="Item Name"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"/>
+
+        <TextView
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="High Price"
+            android:padding="10dp"/>
+
+        <TextView
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="Price"
+            android:padding="10dp"/>
+
+        <TextView
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="Low Price"
+            android:padding="10dp"/>
+
+    </LinearLayout>
+
     <ListView
         android:id="@+id/items_list_view"
         android:layout_width="match_parent"

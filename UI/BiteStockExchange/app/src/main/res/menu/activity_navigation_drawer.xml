@@ -3,10 +3,6 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_order_history"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Order History" />
-        <item
             android:id="@+id/nav_order_summary"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Order Kart" />
@@ -37,11 +33,11 @@
         <menu>
             <item
                 android:id="@+id/nav_friend_invite"
-                android:icon="@drawable/ic_menu_slideshow"
+                android:icon="@drawable/ic_menu_share"
                 android:title="Invite a Friend" />
             <item
                 android:id="@+id/nav_friend_activity"
-                android:icon="@drawable/ic_menu_slideshow"
+                android:icon="@drawable/ic_menu_share"
                 android:title="Friend Activity" />
             <item
                 android:id="@+id/nav_share"

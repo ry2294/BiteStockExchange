@@ -32,7 +32,6 @@ public class ItemsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
-        menuItems = (ArrayList<MenuItem>) args.getSerializable("menuItems");
         title = (String) args.getSerializable("title");
     }
 
@@ -41,6 +40,8 @@ public class ItemsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_items, container, false);
 
         ((TextView) view.findViewById(R.id.menu_items_title)).setText(title);
+        menuItems = DataFactory.getMenuForCategory(title);
+
         itemsListView = (ListView) view.findViewById(R.id.items_list_view);
         itemsAdapter = new ItemsAdapter(menuItems);
         itemsListView.setAdapter(itemsAdapter);
@@ -70,11 +71,10 @@ public class ItemsFragment extends Fragment {
             }
 
             MenuItem menuItem = getItem(position);
-            //Log.e("MenuItem", "menuItemname = " + menuItem.getItemName());
             ((TextView) convertView.findViewById(R.id.menu_item_name)).setText(menuItem.getItemName());
-            ((TextView) convertView.findViewById(R.id.menu_item_actual_price)).setText(String.valueOf(menuItem.getActualPrice()));
-            ((TextView) convertView.findViewById(R.id.menu_item_high_price)).setText(String.valueOf(menuItem.getItemHighPrice()));
-            ((TextView) convertView.findViewById(R.id.menu_item_low_price)).setText(String.valueOf(menuItem.getLowPrice()));
+            ((TextView) convertView.findViewById(R.id.menu_item_actual_price)).setText("$" + String.valueOf(menuItem.getActualPrice()));
+            ((TextView) convertView.findViewById(R.id.menu_item_high_price)).setText("$" + String.valueOf(menuItem.getItemHighPrice()));
+            ((TextView) convertView.findViewById(R.id.menu_item_low_price)).setText("$" + String.valueOf(menuItem.getLowPrice()));
 
             return convertView;
         }

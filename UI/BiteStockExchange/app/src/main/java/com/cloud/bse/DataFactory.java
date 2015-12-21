@@ -4,6 +4,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.cloud.bse.model.FriendInvite;
 import com.cloud.bse.model.MenuItem;
 import com.cloud.bse.model.OrderSummaryItem;
 
@@ -31,13 +32,14 @@ import java.util.Map;
 public class DataFactory {
     private static HashMap<String, OrderSummaryItem> orderSummaryItemHashMap = new HashMap<>();
     private static HashMap<String, MenuItem> menuItemHashMap = new HashMap<>();
-    private static DataFactory ourInstance = new DataFactory();
     private static String user_id;
     private static String user_name;
     private static String fb_token;
     private static String topic;
     private static boolean inner = false;
     private static boolean outer = false;
+    private static ArrayList<FriendInvite> friendInvites = new ArrayList<>();
+    private static DataFactory ourInstance = new DataFactory();
 
     public static DataFactory getInstance() {
         return ourInstance;
@@ -51,6 +53,12 @@ public class DataFactory {
         menuItemHashMap.put("Main Course", new MenuItem("3", "Rice with Beans", 15, 20, "Main Course"));
 
         menuItemHashMap.put("Desserts", new MenuItem("4", "Vanilla", 5, 10, "Desserts"));
+
+        friendInvites.add(new FriendInvite("Sindhura Jhansi", "23498568383798"));
+    }
+
+    public static ArrayList<FriendInvite> getFriendInvites() {
+        return friendInvites;
     }
 
     public static void setTopic (String topic) {
@@ -113,10 +121,17 @@ public class DataFactory {
         return orderSummaryItems;
     }
 
-    public static void setUserInfo(String user_id, String user_name, String fb_token) {
+    public static void setUserInfo(String user_id, String user_name) {
         DataFactory.user_id = user_id;
         DataFactory.user_name = user_name;
+    }
+
+    public static void setFb_token(String fb_token) {
         DataFactory.fb_token = fb_token;
+    }
+
+    public static String getUsername() {
+        return DataFactory.user_name;
     }
 
     public static void fetchMenu() throws IOException {

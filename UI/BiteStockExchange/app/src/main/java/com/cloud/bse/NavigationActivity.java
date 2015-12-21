@@ -2,7 +2,6 @@ package com.cloud.bse;
 
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -10,21 +9,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.cloud.bse.fragments.FriendActivityFragment;
+import com.cloud.bse.fragments.FriendInviteFragment;
 import com.cloud.bse.fragments.ItemsFragment;
-import com.cloud.bse.fragments.MenuFragment;
 import com.cloud.bse.fragments.OrderSummaryFragment;
-import com.cloud.bse.model.OrderSummaryItem;
 
 import java.util.ArrayList;
 
 public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private MenuFragment menuFragment = new MenuFragment();
-    private FriendActivityFragment friendActivityFragment = new FriendActivityFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,18 +40,15 @@ public class NavigationActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment contentFragment = fm.findFragmentById(R.id.navigation_container);
-        if(contentFragment == null) {
-            contentFragment = new ItemsFragment();
-            Bundle args = new Bundle();
-            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Appetizer"));
-            args.putSerializable("title", "Appetizer");
-            contentFragment.setArguments(args);
-            fm.beginTransaction()
-                    .add(R.id.navigation_container, contentFragment)
-                    .commit();
-        }
+        Log.e("NavHeader", "User name = " + DataFactory.getUsername());
+        ((TextView)navigationView.getHeaderView(0).findViewById(R.id.nav_header_name)).setText(DataFactory.getUsername());
+
+        Fragment fragment = new OrderSummaryFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.navigation_container, fragment);
+        transaction.commit();
     }
 
     @Override
@@ -99,7 +94,6 @@ public class NavigationActivity extends AppCompatActivity
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             Fragment fragment = new ItemsFragment();
             Bundle args = new Bundle();
-            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Appetizer"));
             args.putSerializable("title", "Appetizer");
             fragment.setArguments(args);
             transaction.replace(R.id.navigation_container, fragment);
@@ -109,7 +103,6 @@ public class NavigationActivity extends AppCompatActivity
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             Fragment fragment = new ItemsFragment();
             Bundle args = new Bundle();
-            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Soups"));
             args.putSerializable("title", "Soups");
             fragment.setArguments(args);
             transaction.replace(R.id.navigation_container, fragment);
@@ -119,7 +112,6 @@ public class NavigationActivity extends AppCompatActivity
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             Fragment fragment = new ItemsFragment();
             Bundle args = new Bundle();
-            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Main Course"));
             args.putSerializable("title", "Main Course");
             fragment.setArguments(args);
             transaction.replace(R.id.navigation_container, fragment);
@@ -129,7 +121,6 @@ public class NavigationActivity extends AppCompatActivity
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             Fragment fragment = new ItemsFragment();
             Bundle args = new Bundle();
-            args.putSerializable("menuItems", DataFactory.getMenuForCategory("Desserts"));
             args.putSerializable("title", "Desserts");
             fragment.setArguments(args);
             transaction.replace(R.id.navigation_container, fragment);
@@ -142,8 +133,18 @@ public class NavigationActivity extends AppCompatActivity
             transaction.replace(R.id.navigation_container, fragment);
             transaction.commit();
         } else if (id == R.id.nav_friend_activity) {
+            Fragment fragment = new FriendActivityFragment();
+            Bundle args = new Bundle();
+            fragment.setArguments(args);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.navigation_container, friendActivityFragment);
+            transaction.replace(R.id.navigation_container, fragment);
+            transaction.commit();
+        } else if (id == R.id.nav_friend_invite) {
+            Fragment fragment = new FriendInviteFragment();
+            Bundle args = new Bundle();
+            fragment.setArguments(args);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.navigation_container, fragment);
             transaction.commit();
         } else if (id == R.id.nav_share) {
 

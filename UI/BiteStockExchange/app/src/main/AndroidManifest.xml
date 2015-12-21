@@ -21,6 +21,9 @@
             android:value="@string/facebook_app_id" />
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCHIDTmX_KmDJBA-kunxKVQ0I7U8Sr27zM"/>
 
         <activity android:name=".MainActivity">
             <intent-filter>
