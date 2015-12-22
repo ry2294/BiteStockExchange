@@ -9,7 +9,7 @@ client.connect();
 var gcm = require('node-gcm');
 
 var message = new gcm.Message();
-var sender = new gcm.Sender('insert Google Server API Key here');
+var sender = new gcm.Sender('AIzaSyBUemuc9lzUp6yFuNveAhV1Dx9hkX4U65g');
 
 
 //Fetching Friend Order data 
@@ -67,17 +67,17 @@ exports.getFriendNearby= function(req,res,callback)
 //GCM code for inviting friend
 exports.notifyFriend = function(req,res,callback)
 {
-	var user_id = req.body.user_id;
+
 	var user_name = req.body.user_name;
 	var friend_id = req.body.friend_id;
 
-	message.addData(user_id,user_name + 'sent you an invite');
+	message.addData("message",user_name + ' wants you to join them in a meal');
 	
 	sender.send(message, { topic: '/topics/' + friend_id }, function (err, response) {
 	    if(err) console.error(err);
 	    else {
 	    	console.log(response);
-	    	res.json("Notification sent to user" + friend_name);
+	    	res.send("Notification sent to user");
 	    	callback(res);
 	    }
 		
