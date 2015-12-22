@@ -9,4 +9,6 @@ public class Constants {
 
     public static double LATITUDE = 40.8091677;
     public static double LONGITUDE = -73.9579443;
+    public static int IMAGE_WIDTH = 10;
+    public static int IMAGE_LENGTH = 10;
 }

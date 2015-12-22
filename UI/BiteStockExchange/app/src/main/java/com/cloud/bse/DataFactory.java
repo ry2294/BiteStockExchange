@@ -1,5 +1,6 @@
 package com.cloud.bse;
 
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -36,11 +38,13 @@ public class DataFactory {
     private static String user_id;
     private static String user_name;
     private static String fb_token;
+    private static Uri image;
     private static String topic;
     private static boolean inner = false;
     private static boolean outer = false;
     private static ArrayList<FriendInvite> friendInvites = new ArrayList<>();
     private static DataFactory ourInstance = new DataFactory();
+    private static int total_price = 0;
 
     public static DataFactory getInstance() {
         return ourInstance;
@@ -98,23 +102,32 @@ public class DataFactory {
         return items;
     }
 
+    public static int getTotal_price() {
+        return total_price;
+    }
+
     public static void addItemToOrder(String itemId, String itemName, int itemPrice, int quantity, FragmentActivity fragmentActivity) {
         if(!orderSummaryItemHashMap.containsKey(itemId)) {
             Toast.makeText(fragmentActivity, "Item added to Kart", Toast.LENGTH_SHORT).show();
             orderSummaryItemHashMap.put(itemId, new OrderSummaryItem(itemId, itemName, itemPrice, quantity));
+            total_price += itemPrice * quantity;
         } else {
             Toast.makeText(fragmentActivity, "Item already added to Kart", Toast.LENGTH_SHORT).show();
         }
     }
 
     public static void addQuantity(String itemId) {
-        if(orderSummaryItemHashMap.containsKey(itemId))
+        if(orderSummaryItemHashMap.containsKey(itemId)) {
             orderSummaryItemHashMap.get(itemId).addQuantity();
+            total_price += orderSummaryItemHashMap.get(itemId).getItemPrice();
+        }
     }
 
     public static void removeQuantity(String itemId) {
-        if(orderSummaryItemHashMap.containsKey(itemId))
+        if(orderSummaryItemHashMap.containsKey(itemId)) {
             orderSummaryItemHashMap.get(itemId).removeQuantity();
+            total_price -= orderSummaryItemHashMap.get(itemId).getItemPrice();
+        }
     }
 
     public static ArrayList<OrderSummaryItem> getOrderSummaryItems() {
@@ -125,9 +138,10 @@ public class DataFactory {
         return orderSummaryItems;
     }
 
-    public static void setUserInfo(String user_id, String user_name) {
+    public static void setUserInfo(String user_id, String user_name, Uri image) {
         DataFactory.user_id = user_id;
         DataFactory.user_name = user_name;
+        DataFactory.image = image;
     }
 
     public static void setFb_token(String fb_token) {
@@ -136,6 +150,10 @@ public class DataFactory {
 
     public static String getUsername() {
         return DataFactory.user_name;
+    }
+
+    public static Uri getImage() {
+        return DataFactory.image;
     }
 
     public static void fetchMenu() throws IOException {

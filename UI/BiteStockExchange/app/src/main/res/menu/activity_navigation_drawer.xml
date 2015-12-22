@@ -6,28 +6,11 @@
             android:id="@+id/nav_order_summary"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Order Kart" />
+        <item
+            android:id="@+id/nav_menu"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Menu" />
     </group>
-
-    <item android:title="Menu">
-        <menu>
-            <item
-                android:id="@+id/nav_appetizers"
-                android:icon="@drawable/ic_menu_slideshow"
-                android:title="Appetizers" />
-            <item
-                android:id="@+id/nav_soups"
-                android:icon="@drawable/ic_menu_slideshow"
-                android:title="Soups" />
-            <item
-                android:id="@+id/nav_maincourse"
-                android:icon="@drawable/ic_menu_slideshow"
-                android:title="Main Course" />
-            <item
-                android:id="@+id/nav_desserts"
-                android:icon="@drawable/ic_menu_slideshow"
-                android:title="Desserts" />
-        </menu>
-    </item>
 
     <item android:title="Communicate">
         <menu>

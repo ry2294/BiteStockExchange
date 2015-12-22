@@ -42,6 +42,15 @@
         android:text="Place Order"
         android:textSize="20dp"/>
 
+    <TextView
+        android:id="@+id/order_summary_total_price"
+        android:text="Total Price: $0"
+        android:textSize="20dp"
+        android:padding="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"/>
+
     <ListView
         android:id="@+id/order_summary_items_list_view"
         android:layout_width="match_parent"

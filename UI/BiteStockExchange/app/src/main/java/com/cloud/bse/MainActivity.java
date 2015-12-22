@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
                 invokeGCM(profile != null ? profile.getId() : "global");
                 info.setText(info.getText().toString() + " profile = " + (profile != null ? profile.getName() : "null"));
                 if(profile != null) {
-                    DataFactory.setUserInfo(profile.getId(), profile.getName());
+                    DataFactory.setUserInfo(profile.getId(), profile.getName(), profile.getProfilePictureUri(Constants.IMAGE_WIDTH, Constants.IMAGE_LENGTH));
                     InvokeNavigation();
                 }
             }
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity
 
         if(profile != null) {
             InvokeNavigation();
-            DataFactory.setUserInfo(profile.getId(), profile.getName());
+            DataFactory.setUserInfo(profile.getId(), profile.getName(), profile.getProfilePictureUri(Constants.IMAGE_WIDTH, Constants.IMAGE_LENGTH));
         }
 
         mGeofenceList.add(new Geofence.Builder()
@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void invokeGCM(String topic) {
+        Log.e(TAG, "Inside invokeGCM");
         DataFactory.setTopic(topic);
         // Start IntentService to register this application with GCM.
         Intent gcmIntent = new Intent(getApplicationContext(), RegistrationIntentService.class);

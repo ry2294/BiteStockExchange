@@ -26,7 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 /**
  * Created by rakesh on 12/20/15.
  */
-public class FriendInviteFragment extends Fragment {
+public class FriendInviteFragment extends Fragment implements OnMapReadyCallback {
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private Button inviteButton;
@@ -34,23 +34,16 @@ public class FriendInviteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friend_invite, container, false);
-        mapFragment = new SupportMapFragment() {
-            @Override
-            public void onActivityCreated(Bundle savedInstanceState) {
-                super.onActivityCreated(savedInstanceState);
-                googleMap = mapFragment.getMap();
-                if (googleMap != null) {
-                    onMapReady(googleMap);
-                }
-            }
-        };
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        mapFragment = SupportMapFragment.newInstance();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.map, mapFragment);
         transaction.commit();
+        mapFragment.getMapAsync(this);
         return view;
     }
 
-    private void onMapReady(GoogleMap map) {
+    @Override
+    public void onMapReady(GoogleMap map) {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Constants.LATITUDE, Constants.LONGITUDE), 16));
         for(FriendInvite invite : DataFactory.getFriendInvites()) {
             Marker melbourne = map.addMarker(new MarkerOptions()

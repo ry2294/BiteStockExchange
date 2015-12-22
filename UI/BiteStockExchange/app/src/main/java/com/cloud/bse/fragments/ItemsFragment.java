@@ -1,7 +1,9 @@
 package com.cloud.bse.fragments;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,6 +56,17 @@ public class ItemsFragment extends Fragment {
                     }
                 }
         );
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for (MenuItem menuItem : DataFactory.getMenuForCategory(title)) {
+                    menuItem.setActualPrice();
+                }
+                itemsAdapter.notifyDataSetChanged();
+                handler.postDelayed( this, 2000 );
+            }
+        }, 2000);
 
         return view;
     }
@@ -73,8 +86,13 @@ public class ItemsFragment extends Fragment {
             MenuItem menuItem = getItem(position);
             ((TextView) convertView.findViewById(R.id.menu_item_name)).setText(menuItem.getItemName());
             ((TextView) convertView.findViewById(R.id.menu_item_actual_price)).setText("$" + String.valueOf(menuItem.getActualPrice()));
+            int highDiff = menuItem.getItemHighPrice() - menuItem.getActualPrice();
+            int lowDiff = menuItem.getActualPrice() - menuItem.getLowPrice();
+            ((TextView) convertView.findViewById(R.id.menu_item_actual_price)).setBackgroundColor(highDiff < lowDiff ? Color.RED : Color.GREEN);
             ((TextView) convertView.findViewById(R.id.menu_item_high_price)).setText("$" + String.valueOf(menuItem.getItemHighPrice()));
+            ((TextView) convertView.findViewById(R.id.menu_item_high_price)).setBackgroundColor(Color.RED);
             ((TextView) convertView.findViewById(R.id.menu_item_low_price)).setText("$" + String.valueOf(menuItem.getLowPrice()));
+            ((TextView) convertView.findViewById(R.id.menu_item_low_price)).setBackgroundColor(Color.GREEN);
 
             return convertView;
         }

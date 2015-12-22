@@ -1,25 +1,115 @@
 var pg = require('pg');
-var fb = require('./fb_api.js')
+var fb = require('./fb_api.js');
+
+
 var connectionString = 'postgres://postgres:postgres@localhost:5432/bse_db';
 var client = new pg.Client(connectionString);
 client.connect();
 
+var gcm = require('node-gcm');
+
+var message = new gcm.Message();
+var sender = new gcm.Sender('insert Google Server API Key here');
+
+
+//Fetching Friend Order data 
+exports.getFriendActivity = function(req,res,callback)
+{
+	var user_id = req.params.user_id;;
+	var fav_list = [];
+	console.log('Connected to database');
+	var query = client.query("select count(*) as count,u.friend_id, o.item_id as item_id, m.item_name as item_name, user_tbl.user_name as friend_name from user_connections_tbl as u, order_tbl as o, menu_item_tbl as m, user_tbl where o.user_id = u.friend_id and u.user_id = $1 and m.item_id = o.item_id and u.friend_id = user_tbl.user_id group by u.friend_id, o.item_id, m.item_name, user_tbl.user_name order by count desc;", [user_id]);
+	query.on('row', function(row) {
+		console.log('Row received') ;
+		var item ={
+					item_name : row.item_name, 
+					friend_name : row.friend_name, 
+					count : row.count 
+				  };
+
+				fav_list.push(item);
+	});
+	query.on('end', function(row) {
+		res.json(fav_list);
+		callback(res);
+	});
+}
+
+//Fetching Friends inside the GEO fence
+exports.getFriendNearby= function(req,res,callback)
+{ 
+	var user_id = req.params.user_id;;
+	var near_list = [];
+	console.log('Connected to database');
+
+	//Have to change query for getting friends nearby--Diksha
+
+	var query = client.query("select count(*) as count,u.friend_id, o.item_id as item_id, m.item_name as item_name, user_tbl.user_name as friend_name from user_connections_tbl as u, order_tbl as o, menu_item_tbl as m, user_tbl where o.user_id = u.friend_id and u.user_id = $1 and m.item_id = o.item_id and u.friend_id = user_tbl.user_id group by u.friend_id, o.item_id, m.item_name, user_tbl.user_name order by count desc;", [user_id]);
+	query.on('row', function(row) {
+		console.log('Row received') ;
+		var item ={
+					friend_id : row.friend_id, 
+					friend_name : row.friend_name, 
+					lat : row.lat,
+					lng  : row.lng 
+				  };
+
+				near_list.push(item);
+	});
+	query.on('end', function(row) {
+		res.json(near_list);
+		callback(res);
+	});
+}
+
+
+
+//GCM code for inviting friend
+exports.notifyFriend = function(req,res,callback)
+{
+	var user_id = req.body.user_id;
+	var user_name = req.body.user_name;
+	var friend_id = req.body.friend_id;
+
+	message.addData(user_id,user_name + 'sent you an invite');
+	
+	sender.send(message, { topic: '/topics/' + friend_id }, function (err, response) {
+	    if(err) console.error(err);
+	    else {
+	    	console.log(response);
+	    	res.json("Notification sent to user" + friend_name);
+	    	callback(res);
+	    }
+		
+	});
+}
+//Add User to database after checking existence of user in DB based on previous login
 exports.addUser = function(req,res,callback)
 {
-
 	var user_id = req.body.user_id;
 	//var user_name = req.body.user_name;
-	var fb_token = req.body.fb_token
+	var fb_token = req.body.fb_token;
 
 
 	console.log('Connected to database');
 	console.log('User id ' + req.body.user_id);
+	var queryToCheckUserExistence = client.query("select * from user_tbl where user_id = $1",[user_id],function(err,result)
+	{
+	var rowCount = result.rows.length;
+    if(rowCount == 0)
+    { 
 	fb.getUserName(req, res, handleResult);
 	function handleResult(response){	
 		var user_name = response.name;
 	    var query = client.query("insert into user_tbl(user_id,user_name,fb_token) values($1,$2,$3)", [user_id,user_name,fb_token]);
+	}
+	}
+	else 
+	{
+	    var query = client.query("update user_tbl set fb_token = $1 where user_id = $2", [fb_token,user_id]);
+	}
 		query.on('end', function(result) {
-			console.log("Query executed");
+		console.log("Query executed");
 
 			fb.getFBFriends(req, res, handleResult);
 			function handleResult(response){
@@ -52,14 +142,89 @@ exports.addUser = function(req,res,callback)
 						});
 				   
 			    }
+			    if(friend_array.length == 0)
+			    {
+			    	res.status(200);
+					res.json({"User ID added with his connections" : user_id});
+				    callback(res);
+			    }
 			   });
-			    
-
 			}
-		});
-	}
+	    });
+});
 }
 
+//Updating user data for entry to geo-fence
+exports.userEnter = function(req,res,callback)
+{
+	
+	var user_id = req.body.user_id;
+	var lat = req.body.lat;
+	var lng = req.body.lng;
+
+	console.log('Connected to database');
+	console.log('User id' + req.body.user_id);
+
+	var queryToUpdateFence = client.query("update user_tbl set lat = $1,lng = $2,user_near = 1 where user_id = $3",[lat, lng, user_id]);
+	queryToUpdateFence.on('end', function(result)
+	{					
+
+		res.status(200);
+	    res.send("User location updated for entering fence");
+	    callback(res);
+
+	});
+
+
+}
+
+//Updating user data for exit from geo-fence
+exports.userExit = function(req,res,callback)
+{
+	var user_id = req.body.user_id;
+
+	console.log('Connected to database');
+	console.log('User id' + req.body.user_id);
+
+	var queryToUpdateFence = client.query("update user_tbl set lat = 0, lng = 0, user_near = 0 where user_id = $1",[user_id]);
+	queryToUpdateFence.on('end', function(result)
+	{					
+
+		res.status(200);
+	    res.send("User location updated for exiting fence");
+	    callback(res);
+
+	});
+}
+
+
+//Fetching menu items
+exports.getMenuItems = function(req,res,callback)
+{ 
+	var menu_items = [];
+	console.log('Connected to database');
+	var query = client.query("Select * from menu_item_tbl");
+	query.on('row', function(row) {
+		console.log('Row received') ;
+
+		var item =	{
+					item_id : row.item_id, 
+					item_name : row.item_name, 
+					high_price : row.high_price, 
+					low_price : row.low_price,
+					item_category : row.item_category
+					};
+
+					menu_items.push(item);
+	});
+	query.on('end', function(row) {
+
+		res.status(200).json(menu_items);
+		callback(res);
+	});
+}
+
+//Order placing and logic for handling prices post a single order
 
 exports.addOrder = function(req,res,callback)
 {
@@ -94,54 +259,5 @@ exports.addOrder = function(req,res,callback)
 					}
 				});
 			});
-
 	}
-}
-
-
-exports.getMenuItems = function(req,res,callback)
-{ 
-	var menu_items = [];
-	console.log('Connected to database');
-	var query = client.query("Select * from menu_item_tbl");
-	query.on('row', function(row) {
-		console.log('Row received') ;
-
-		var item =	{
-					item_id : row.item_id, 
-					item_name : row.item_name, 
-					high_price : row.high_price, 
-					low_price : row.low_price,
-					item_category : row.item_category
-					};
-
-					menu_items.push(item);
-	});
-	query.on('end', function(row) {
-
-		res.status(200).json(menu_items);
-		callback(res);
-	});
-}
-
-exports.getFriendActivity = function(req,res,callback)
-{ 
-	var user_id = req.params.user_id;;
-	var fav_list = [];
-	console.log('Connected to database');
-	var query = client.query("select count(*) as count,u.friend_id, o.item_id as item_id, m.item_name as item_name, user_tbl.user_name as friend_name from user_connections_tbl as u, order_tbl as o, menu_item_tbl as m, user_tbl where o.user_id = u.friend_id and u.user_id = $1 and m.item_id = o.item_id and u.friend_id = user_tbl.user_id group by u.friend_id, o.item_id, m.item_name, user_tbl.user_name order by count desc;", [user_id]);
-	query.on('row', function(row) {
-		console.log('Row received') ;
-		var item ={
-					item_name : row.item_name, 
-					friend_name : row.friend_name, 
-					count : row.count 
-				  };
-
-				fav_list.push(item);
-	});
-	query.on('end', function(row) {
-		res.json(fav_list);
-		callback(res);
-	});
 }

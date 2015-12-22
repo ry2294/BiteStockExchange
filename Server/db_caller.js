@@ -34,7 +34,7 @@ router.use(function(req, res, next) {
 // test route to make sure everything is working (accessed at GET http://localhost:16386/api)
 router.get('/', function(req, res) {
    // Logic to show student here
-	 res.json({ message: 'Welcome to our restaurant backend!!' });
+   res.json({ message: 'Welcome to our restaurant backend!!' });
 });
 
 // more routes for our API will happen here
@@ -60,9 +60,43 @@ router.route('/friend/activity/:user_id')
             return;
           }
           res.json(response.body);
-          console.log("Request handled");
+          console.log("Friend activity fetched");
       }
     });
+
+router.route('/friend/invite/:user_id')
+
+    // get the student with that id (accessed at GET http://localhost:16386/api/student/:student_id)
+    .get(function(req, res) {
+
+      // Logic to show student here
+      db.getFriendNearby(req,res,handleResult);
+      function handleResult(response, err){
+          if(err)
+          {
+            console.error(err.stack || err.message);
+            return;
+          }
+          res.json(response.body);
+          console.log("Friends nearby fetched");
+      }
+  });
+
+
+router.route('/friend/invite')
+
+  .post(function(req, res) {
+  db.notifyFriend(req, res, handleResult);
+  function handleResult(response){
+    console.log('Callback received');
+    console.log("Status code " +response.statusCode);
+    if(response.statusCode == 200){
+      console.log('200');
+      res.status(200);
+      res.json({ message: 'Friend notified', returnStatus : '200'});
+    }
+  }
+});
 
 router.route('/user/register')
 
@@ -80,26 +114,59 @@ router.route('/user/register')
       }
     });
 
+router.route('/user/enter')
+
+    .post(function(req, res) {
+
+      db.userEnter(req, res, handleResult);
+      function handleResult(response){
+        console.log('Callback received');
+        console.log("Status code " + response.statusCode);
+        if(response.statusCode == 200){
+        console.log('200');
+        res.status(200);
+        res.json({ message: 'User entered in Geofence!', returnStatus : '200'});
+        }
+      }
+    });
+
+router.route('/user/exit')
+
+    .post(function(req, res) {
+
+      db.userExit(req, res, handleResult);
+      function handleResult(response){
+        console.log('Callback received');
+        console.log("Status code " + response.statusCode);
+        if(response.statusCode == 200){
+        console.log('200');
+        res.status(200);
+        res.json({ message: 'User exited Geo Fence!', returnStatus : '200'});
+        }
+      }
+    });
+
 //API end point to get student details (accessed at GET http://localhost:16386/api/student/id)
 router.route('/menu')
 
     // get the student with that id (accessed at GET http://localhost:16386/api/student/:student_id)
     .get(function(req, res) {
-    	// Logic to show student here
-			db.getMenuItems(req,res,handleResult);
-			function handleResult(response, err){
-					if(err)
-					{
-						console.error(err.stack || err.message);
-						return;
-					}
-					res.json(response.body);
-					console.log("Request handled; Menu Returned");
-			}
+      // Logic to show student here
+      db.getMenuItems(req,res,handleResult);
+      function handleResult(response, err){
+          if(err)
+          {
+            console.error(err.stack || err.message);
+            return;
+          }
+          res.json(response.body);
+          console.log("Request handled; Menu Returned");
+      }
     });
+    
 router.route('/menu/order')
 
-    .post(function(req, res) {
+  .post(function(req, res) {
   db.addOrder(req, res, handleResult);
   function handleResult(response){
     console.log('Callback received');
@@ -111,6 +178,8 @@ router.route('/menu/order')
     }
   }
 });
+
+
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
 app.use('/api', router);

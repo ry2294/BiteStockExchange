@@ -12,11 +12,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cloud.bse.fragments.FriendActivityFragment;
 import com.cloud.bse.fragments.FriendInviteFragment;
 import com.cloud.bse.fragments.ItemsFragment;
+import com.cloud.bse.fragments.MenuFragment;
 import com.cloud.bse.fragments.OrderSummaryFragment;
 
 import java.util.ArrayList;
@@ -43,9 +45,7 @@ public class NavigationActivity extends AppCompatActivity
         Log.e("NavHeader", "User name = " + DataFactory.getUsername());
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.nav_header_name)).setText(DataFactory.getUsername());
 
-        Fragment fragment = new OrderSummaryFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
+        Fragment fragment = new MenuFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.navigation_container, fragment);
         transaction.commit();
@@ -89,40 +89,10 @@ public class NavigationActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_appetizers) {
+        if (id == R.id.nav_menu) {
             // Handle the menu
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            Fragment fragment = new ItemsFragment();
-            Bundle args = new Bundle();
-            args.putSerializable("title", "Appetizer");
-            fragment.setArguments(args);
-            transaction.replace(R.id.navigation_container, fragment);
-            transaction.commit();
-        } else if (id == R.id.nav_soups) {
-            // Handle the menu
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            Fragment fragment = new ItemsFragment();
-            Bundle args = new Bundle();
-            args.putSerializable("title", "Soups");
-            fragment.setArguments(args);
-            transaction.replace(R.id.navigation_container, fragment);
-            transaction.commit();
-        } else if (id == R.id.nav_maincourse) {
-            // Handle the menu
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            Fragment fragment = new ItemsFragment();
-            Bundle args = new Bundle();
-            args.putSerializable("title", "Main Course");
-            fragment.setArguments(args);
-            transaction.replace(R.id.navigation_container, fragment);
-            transaction.commit();
-        } else if (id == R.id.nav_desserts) {
-            // Handle the menu
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            Fragment fragment = new ItemsFragment();
-            Bundle args = new Bundle();
-            args.putSerializable("title", "Desserts");
-            fragment.setArguments(args);
+            Fragment fragment = new MenuFragment();
             transaction.replace(R.id.navigation_container, fragment);
             transaction.commit();
         } else if (id == R.id.nav_order_summary) {

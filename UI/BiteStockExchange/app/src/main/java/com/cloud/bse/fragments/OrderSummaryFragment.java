@@ -25,6 +25,7 @@ public class OrderSummaryFragment extends Fragment {
     private ItemsAdapter itemsAdapter;
     private ListView itemsListView;
     private Button placeOrderButton;
+    private TextView total_price;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,9 @@ public class OrderSummaryFragment extends Fragment {
             }
         });
 
+        total_price = (TextView) view.findViewById(R.id.order_summary_total_price);
+        total_price.setText("Total Price: $" + DataFactory.getTotal_price());
+
         return view;
     }
 
@@ -93,6 +97,7 @@ public class OrderSummaryFragment extends Fragment {
                     quantityTextView.setText(String.valueOf(orderSummaryItem.getQuantity()));
                     int totalPrice = orderSummaryItem.getItemPrice() * orderSummaryItem.getQuantity();
                     totalPriceTextView.setText("$" + String.valueOf(totalPrice));
+                    total_price.setText("Total Price: $" + DataFactory.getTotal_price());
                 }
             });
             Button remove = (Button) convertView.findViewById(R.id.order_summary_item_quantity_remove_button);
@@ -103,6 +108,7 @@ public class OrderSummaryFragment extends Fragment {
                     quantityTextView.setText(String.valueOf(orderSummaryItem.getQuantity()));
                     int totalPrice = orderSummaryItem.getItemPrice() * orderSummaryItem.getQuantity();
                     totalPriceTextView.setText("$" + String.valueOf(totalPrice));
+                    total_price.setText("Total Price: $" + DataFactory.getTotal_price());
                 }
             });
             return convertView;
