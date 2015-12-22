@@ -90,25 +90,7 @@ exports.addUser = function(req,res,callback)
 	//var user_name = req.body.user_name;
 	var fb_token = req.body.fb_token;
 
-
-	console.log('Connected to database');
-	console.log('User id ' + req.body.user_id);
-	var queryToCheckUserExistence = client.query("select * from user_tbl where user_id = $1",[user_id],function(err,result)
-	{
-	var rowCount = result.rows.length;
-    if(rowCount == 0)
-    { 
-	fb.getUserName(req, res, handleResult);
-	function handleResult(response){	
-		var user_name = response.name;
-	    var query = client.query("insert into user_tbl(user_id,user_name,fb_token) values($1,$2,$3)", [user_id,user_name,fb_token]);
-	}
-	}
-	else 
-	{
-	    var query = client.query("update user_tbl set fb_token = $1 where user_id = $2", [fb_token,user_id]);
-	}
-		query.on('end', function(result) {
+	var addConnection = function(err, result) {
 		console.log("Query executed");
 
 			fb.getFBFriends(req, res, handleResult);
@@ -150,8 +132,27 @@ exports.addUser = function(req,res,callback)
 			    }
 			   });
 			}
-	    });
-});
+	    };
+
+	
+	console.log('Connected to database');
+	console.log('User id ' + req.body.user_id);
+	var queryToCheckUserExistence = client.query("select * from user_tbl where user_id = $1",[user_id],
+		function(err,result){
+			var rowCount = result.rows.length;
+		    if(rowCount == 0)
+		    { 
+				fb.getUserName(req, res, handleResult);
+				function handleResult(response){	
+					var user_name = response.name;
+				    client.query("insert into user_tbl(user_id,user_name,fb_token) values($1,$2,$3)", [user_id,user_name,fb_token], addConnection);
+				}
+			}
+			else 
+			{
+			    client.query("update user_tbl set fb_token = $1 where user_id = $2", [fb_token,user_id], addConnection);
+			}
+	});
 }
 
 //Updating user data for entry to geo-fence
