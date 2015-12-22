@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
@@ -94,8 +95,7 @@ public class MainActivity extends AppCompatActivity
                 invokeGCM(profile != null ? profile.getId() : "global");
                 info.setText(info.getText().toString() + " profile = " + (profile != null ? profile.getName() : "null"));
                 if(profile != null) {
-                    DataFactory.setUserInfo(profile.getId(), profile.getName(), profile.getProfilePictureUri(Constants.IMAGE_WIDTH, Constants.IMAGE_LENGTH));
-                    InvokeNavigation();
+                    InvokeNavigation(profile.getId(), profile.getName(), profile.getProfilePictureUri(Constants.IMAGE_WIDTH, Constants.IMAGE_LENGTH));
                 }
             }
         };
@@ -132,8 +132,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         if(profile != null) {
-            InvokeNavigation();
-            DataFactory.setUserInfo(profile.getId(), profile.getName(), profile.getProfilePictureUri(Constants.IMAGE_WIDTH, Constants.IMAGE_LENGTH));
+            InvokeNavigation(profile.getId(), profile.getName(), profile.getProfilePictureUri(Constants.IMAGE_WIDTH, Constants.IMAGE_LENGTH));
         }
 
         mGeofenceList.add(new Geofence.Builder()
@@ -152,13 +151,6 @@ public class MainActivity extends AppCompatActivity
         Intent geoFenceIntent = new Intent(this, GeofenceTransitionsIntentService.class);
 
         mGeofencePendingIntent = PendingIntent.getService(this, 0, geoFenceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        ((Button) findViewById(R.id.start_app_button)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                InvokeNavigation();
-            }
-        });
 
         gcmText = (TextView) findViewById(R.id.gcm_text);
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -193,6 +185,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected Void doInBackground(Void... param) {
             try {
+                DataFactory.registerUser();
                 DataFactory.fetchMenu();
             } catch (Exception e) {
                 publishProgress("Failed to Register user. Exception = " + e.toString());
@@ -211,9 +204,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void InvokeNavigation() {
-        Intent intent = new Intent(this, NavigationActivity.class);
-        startActivity(intent);
+    public void InvokeNavigation(String user_id, String user_name, Uri image) {
+        DataFactory.setUserInfo(user_id, user_name, image);
+//        pDialog = new ProgressDialog(getApplicationContext());
+//        pDialog.show();
+        //Intent intent = new Intent(this, NavigationActivity.class);
+        //startActivity(intent);
     }
 
     @Override

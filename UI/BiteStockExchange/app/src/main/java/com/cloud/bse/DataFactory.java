@@ -159,7 +159,7 @@ public class DataFactory {
     public static void fetchMenu() throws IOException {
         JSONArray response;
         try {
-            URL url = new URL("http://10.0.2.2:16386/api/menu");
+            URL url = new URL(Constants.SERVER + "/api/menu");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             int responseCode = conn.getResponseCode();
 
@@ -209,7 +209,7 @@ public class DataFactory {
     public static String registerUser() throws IOException {
         String response = "";
 
-        URL url = new URL("http://10.0.2.2:16386/api/user/register");
+        URL url = new URL(Constants.SERVER + "/api/user/register");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setDoInput(true);

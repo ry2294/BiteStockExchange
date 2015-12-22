@@ -11,4 +11,6 @@ public class Constants {
     public static double LONGITUDE = -73.9579443;
     public static int IMAGE_WIDTH = 10;
     public static int IMAGE_LENGTH = 10;
+
+    public static String SERVER = "https://73fc2dd0.ngrok.com";
 }
