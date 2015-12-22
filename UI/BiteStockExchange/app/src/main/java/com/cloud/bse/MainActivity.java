@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity
 
         mGeofenceList.add(new Geofence.Builder()
                 .setRequestId(Constants.GEO_INNER)
-                .setCircularRegion(40.8091677, -73.9579443, 25)
+                .setCircularRegion(Constants.LATITUDE, Constants.LONGITUDE, 25)
                 .setExpirationDuration(Long.MAX_VALUE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
                         Geofence.GEOFENCE_TRANSITION_EXIT)

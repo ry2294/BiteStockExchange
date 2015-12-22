@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.cloud.bse.model.FriendInvite;
 import com.cloud.bse.model.MenuItem;
 import com.cloud.bse.model.OrderSummaryItem;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,7 +55,10 @@ public class DataFactory {
 
         menuItemHashMap.put("Desserts", new MenuItem("4", "Vanilla", 5, 10, "Desserts"));
 
-        friendInvites.add(new FriendInvite("Sindhura Jhansi", "23498568383798"));
+        friendInvites.add(new FriendInvite("Sindhura Jhansi", "23498568383798", new LatLng(40.810776, -73.958588)));
+        friendInvites.add(new FriendInvite("Varun Shetty", "34984328383798", new LatLng(40.809409, -73.960046)));
+        friendInvites.add(new FriendInvite("Diksha Haresh", "98568383798", new LatLng(40.808816, -73.959491)));
+        friendInvites.add(new FriendInvite("Tanaya", "8568383798", new LatLng(40.809774, -73.958501)));
     }
 
     public static ArrayList<FriendInvite> getFriendInvites() {

@@ -1,62 +1,70 @@
 package com.cloud.bse.fragments;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.Button;
 
+import com.cloud.bse.Constants;
 import com.cloud.bse.DataFactory;
 import com.cloud.bse.R;
 import com.cloud.bse.model.FriendInvite;
-
-import java.util.ArrayList;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Created by rakesh on 12/20/15.
  */
 public class FriendInviteFragment extends Fragment {
-    private InviteAdapter inviteAdapter;
+    private SupportMapFragment mapFragment;
+    private GoogleMap googleMap;
+    private Button inviteButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friend_invite, container, false);
-
-        ListView friendInvitesListView = (ListView) view.findViewById(R.id.friend_invite_listview);
-        inviteAdapter = new InviteAdapter(DataFactory.getFriendInvites());
-        friendInvitesListView.setAdapter(inviteAdapter);
-        friendInvitesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mapFragment = new SupportMapFragment() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                FriendInvite invite = inviteAdapter.getItem(position);
-                Toast.makeText(getActivity(), "Inviting " + invite.getName(), Toast.LENGTH_SHORT).show();
+            public void onActivityCreated(Bundle savedInstanceState) {
+                super.onActivityCreated(savedInstanceState);
+                googleMap = mapFragment.getMap();
+                if (googleMap != null) {
+                    onMapReady(googleMap);
+                }
             }
-        });
-
+        };
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.map, mapFragment);
+        transaction.commit();
         return view;
     }
 
-    private class InviteAdapter extends ArrayAdapter<FriendInvite> {
-        public InviteAdapter(ArrayList<FriendInvite> invites) {
-            super(getActivity(), 0, invites);
+    private void onMapReady(GoogleMap map) {
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Constants.LATITUDE, Constants.LONGITUDE), 16));
+        for(FriendInvite invite : DataFactory.getFriendInvites()) {
+            Marker melbourne = map.addMarker(new MarkerOptions()
+                    .position(invite.getLatLng())
+                    .title(invite.getFriendName())
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+            );
         }
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null) {
-                convertView = getActivity().getLayoutInflater()
-                        .inflate(R.layout.friend_invite_list_item, null);
+                return false;
             }
-
-            FriendInvite invite = getItem(position);
-            ((TextView) convertView.findViewById(R.id.friend_invite_name)).setText(invite.getName());
-
-            return convertView;
-        }
+        });
     }
 }

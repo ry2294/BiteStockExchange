@@ -11,8 +11,28 @@
         android:padding="10dp"
         android:textSize="30dp"/>
 
-    <ListView
-        android:id="@+id/friend_invite_listview"
+    <LinearLayout
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp">
+
+        <Button
+            android:text="Invite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/friend_invite_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="Please click on a marker"
+            android:padding="10dp"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"></ListView>
+        android:layout_height="fill_parent" />
 </LinearLayout>
