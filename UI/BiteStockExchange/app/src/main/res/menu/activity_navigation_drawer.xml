@@ -3,14 +3,23 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_order_summary"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Order Kart" />
-        <item
             android:id="@+id/nav_menu"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Menu" />
     </group>
+
+    <item android:title="Order">
+        <menu>
+            <item
+                android:id="@+id/nav_order_history"
+                android:icon="@drawable/ic_menu_gallery"
+                android:title="Order Summary" />
+            <item
+                android:id="@+id/nav_order_summary"
+                android:icon="@drawable/ic_menu_gallery"
+                android:title="Order Kart" />
+        </menu>
+    </item>
 
     <item android:title="Communicate">
         <menu>

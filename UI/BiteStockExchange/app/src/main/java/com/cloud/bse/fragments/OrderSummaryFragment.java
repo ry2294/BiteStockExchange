@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cloud.bse.DataFactory;
+import com.cloud.bse.NavigationActivity;
 import com.cloud.bse.R;
 import com.cloud.bse.model.OrderSummaryItem;
 
@@ -30,6 +32,7 @@ public class OrderSummaryFragment extends Fragment {
     private Button placeOrderButton;
     private TextView total_price;
     private ProgressDialog pDialog;
+    private Button backToMenu;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,16 @@ public class OrderSummaryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_ordersummary, container, false);
 
         pDialog = new ProgressDialog(getActivity());
-
+        backToMenu = (Button) view.findViewById(R.id.order_summary_menu_button);
+        backToMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                Fragment fragment = new MenuFragment();
+                transaction.replace(R.id.navigation_container, fragment);
+                transaction.commit();
+            }
+        });
         Spinner table = (Spinner) view.findViewById(R.id.table_number_spinner);
         String[] items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
@@ -75,6 +87,8 @@ public class OrderSummaryFragment extends Fragment {
 
         total_price = (TextView) view.findViewById(R.id.order_summary_total_price);
         total_price.setText("Total Price: $" + DataFactory.getTotal_price());
+
+
 
         return view;
     }

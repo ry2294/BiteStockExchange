@@ -198,8 +198,6 @@ public class MainActivity extends AppCompatActivity
                 DataFactory.fetchMenu();
                 DataFactory.fetchFriendActivity();
                 DataFactory.fetchFriendInvites();
-                // DataFactory.enterGeoFence("40.809435", "-73.959828");
-                // DataFactory.exitGeoFence();
             } catch (Exception e) {
                 publishProgress("Failed to Register user. Exception = " + e.toString());
                 Log.e("Registration", e.toString());
@@ -264,6 +262,9 @@ public class MainActivity extends AppCompatActivity
         if (mLastLocation != null) {
             mLatitudeText.setText("Latitude = " + mLastLocation.getLatitude());
             mLongitudeText.setText("Longitude = " + mLastLocation.getLongitude());
+            try {
+                DataFactory.enterGeoFence(String.valueOf(mLastLocation.getLatitude()), String.valueOf(mLastLocation.getLongitude()));
+            } catch (Exception e) {}
         } else {
             mLatitudeText.setText("No location detected");
             mLongitudeText.setText("No location detected");

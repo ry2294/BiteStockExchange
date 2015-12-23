@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/order_summary_title"
-        android:text="Order Summary"
+        android:text="Order Kart"
         android:textSize="30dp"
         android:paddingTop="10dp"
         android:layout_width="wrap_content"
@@ -35,12 +35,27 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/order_summary_place_order_button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Place Order"
-        android:textSize="20dp"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/order_summary_place_order_button"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="Place Order"
+            android:textSize="20dp"/>
+
+        <Button
+            android:id="@+id/order_summary_menu_button"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="Back to Menu"
+            android:textSize="20dp"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/order_summary_total_price"

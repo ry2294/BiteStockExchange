@@ -1,5 +1,7 @@
 package com.cloud.bse;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -12,28 +14,25 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cloud.bse.fragments.FriendActivityFragment;
 import com.cloud.bse.fragments.FriendInviteFragment;
-import com.cloud.bse.fragments.ItemsFragment;
 import com.cloud.bse.fragments.MenuFragment;
+import com.cloud.bse.fragments.OrderHistoryFragment;
 import com.cloud.bse.fragments.OrderSummaryFragment;
-
-import java.util.ArrayList;
 
 public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    private ProgressDialog pDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        pDialog = new ProgressDialog(this);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -46,8 +45,8 @@ public class NavigationActivity extends AppCompatActivity
         Log.e("NavHeader", "User name = " + DataFactory.getUsername());
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.nav_header_name)).setText(DataFactory.getUsername());
 
-        Fragment fragment = new MenuFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = new MenuFragment();
         transaction.replace(R.id.navigation_container, fragment);
         transaction.commit();
     }
@@ -91,11 +90,8 @@ public class NavigationActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_menu) {
-            // Handle the menu
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            Fragment fragment = new MenuFragment();
-            transaction.replace(R.id.navigation_container, fragment);
-            transaction.commit();
+            FetchMenu fetchMenu = new FetchMenu();
+            fetchMenu.execute();
         } else if (id == R.id.nav_order_summary) {
             Fragment fragment = new OrderSummaryFragment();
             Bundle args = new Bundle();
@@ -103,6 +99,9 @@ public class NavigationActivity extends AppCompatActivity
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.navigation_container, fragment);
             transaction.commit();
+        } else if (id == R.id.nav_order_history) {
+            FetchHistory fetchHistory = new FetchHistory();
+            fetchHistory.execute();
         } else if (id == R.id.nav_friend_activity) {
             Fragment fragment = new FriendActivityFragment();
             Bundle args = new Bundle();
@@ -124,5 +123,68 @@ public class NavigationActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public class FetchMenu extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected Void doInBackground(Void... param) {
+            try {
+                DataFactory.fetchMenu();
+            } catch (Exception e) {
+                publishProgress("Failed to fetch menu. Exception = " + e.toString());
+                Log.e("FetchMenu", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... param) {
+        }
+
+        @Override
+        protected void onPostExecute(Void param) {
+            // Handle the menu
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            Fragment fragment = new MenuFragment();
+            transaction.replace(R.id.navigation_container, fragment);
+            transaction.commit();
+        }
+    }
+
+    private class FetchHistory extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            pDialog.setMessage("Fetching history...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... param) {
+            try {
+                DataFactory.fetchOrderHistory();
+            } catch (Exception e) {
+                publishProgress("Failed to fetch history. Exception = " + e.toString());
+                Log.e("PlaceOrder", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... param) {
+        }
+
+        @Override
+        protected void onPostExecute(Void param) {
+            if(pDialog.isShowing()) pDialog.dismiss();
+            Fragment fragment = new OrderHistoryFragment();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.navigation_container, fragment);
+            transaction.commit();
+        }
     }
 }

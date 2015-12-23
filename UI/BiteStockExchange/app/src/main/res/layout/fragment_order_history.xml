@@ -7,9 +7,40 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Order History"
+        android:text="Order Summary"
         android:padding="10dp"
         android:textSize="30dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/order_history_paybill_button"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="Pay Bill"
+            android:textSize="20dp"/>
+
+        <Button
+            android:id="@+id/order_history_menu_button"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="Back to Menu"
+            android:textSize="20dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/order_history_total_price"
+        android:text="Total Price: $0"
+        android:textSize="20dp"
+        android:padding="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"/>
 
     <ListView
         android:id="@+id/order_history_listview"

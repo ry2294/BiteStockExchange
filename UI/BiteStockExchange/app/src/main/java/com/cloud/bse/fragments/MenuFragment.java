@@ -1,5 +1,7 @@
 package com.cloud.bse.fragments;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -7,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +24,10 @@ import java.util.ArrayList;
  * Created by Rakesh on 12/4/15.
  */
 public class MenuFragment extends Fragment {
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.view_pager);
-
 
         MenuPagerAdapter menuPagerAdapter = new MenuPagerAdapter(getActivity().getSupportFragmentManager());
         viewPager.setAdapter(menuPagerAdapter);
@@ -34,6 +35,7 @@ public class MenuFragment extends Fragment {
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
         tabLayout.setTabsFromPagerAdapter(menuPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+
         return view;
     }
 

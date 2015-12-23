@@ -36,6 +36,7 @@ import java.util.Map;
  */
 public class DataFactory {
     private static HashMap<String, OrderSummaryItem> orderSummaryItemHashMap = new HashMap<>();
+    private static ArrayList<OrderSummaryItem> orderHistoryItems = new ArrayList<>();
     private static HashMap<String, MenuItem> menuItemHashMap = new HashMap<>();
     private static ArrayList<FriendActivity> friendActivities = new ArrayList<>();
     private static String user_id;
@@ -49,6 +50,7 @@ public class DataFactory {
     private static DataFactory ourInstance = new DataFactory();
     private static int total_price = 0;
     public static FriendInvite friendInvite;
+    public static int totalOrderPrice = 0;
 
     public static DataFactory getInstance() {
         return ourInstance;
@@ -67,6 +69,16 @@ public class DataFactory {
         friendInvites.add(new FriendInvite("Varun Shetty", "34984328383798", new LatLng(40.809409, -73.960046)));
         friendInvites.add(new FriendInvite("Diksha Haresh", "98568383798", new LatLng(40.808816, -73.959491)));
         friendInvites.add(new FriendInvite("Tanaya", "8568383798", new LatLng(40.809774, -73.958501)));
+
+        orderHistoryItems.add(new OrderSummaryItem("321421", "Corn Soup", 4, 10));
+    }
+
+    public static ArrayList<OrderSummaryItem> getOrderHistoryItems() {
+        return orderHistoryItems;
+    }
+
+    public static void clearHistoryItems() {
+        orderHistoryItems.clear();
     }
 
     public static ArrayList<FriendInvite> getFriendInvites() {
@@ -189,6 +201,30 @@ public class DataFactory {
         }
     }
 
+    public static void fetchOrderHistory() {
+        JSONObject response;
+        orderHistoryItems.clear();
+        try{
+            URL url = new URL(Constants.SERVER + "/api/menu/bill/" + user_id);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            int responseCode = conn.getResponseCode();
+
+            if(responseCode == HttpURLConnection.HTTP_OK) {
+                String responseString = readStream(conn.getInputStream());
+                Log.v("FetchOrderHistory", responseString);
+                response = new JSONObject(responseString);
+                DataFactory.totalOrderPrice = response.getInt("total_price");
+                JSONArray items = response.getJSONArray("items");
+                for(int i=0; i < items.length(); i++) {
+                    JSONObject item = items.getJSONObject(i);
+                    orderHistoryItems.add(new OrderSummaryItem("", item.getString("item_name"), item.getInt("count"), item.getInt("price")));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void fetchFriendInvites() throws IOException {
         JSONArray response;
         friendInvites.clear();
@@ -267,6 +303,41 @@ public class DataFactory {
             }
         }
         return response.toString();
+    }
+
+    public static String payBill() throws IOException {
+        String response = "";
+        URL url = new URL(Constants.SERVER + "/api/menu/pay");
+
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+
+        OutputStream os = conn.getOutputStream();
+        BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(os, "UTF-8"));
+
+        HashMap<String, String> postDataParams = new HashMap<>();
+        postDataParams.put("user_id", user_id);
+        writer.write(getPostDataString(postDataParams));
+        writer.flush();
+        writer.close();
+        os.close();
+        int responseCode=conn.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String line = "Request Success";
+            BufferedReader br=new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            while ((line=br.readLine()) != null) {
+                response+=line;
+            }
+        }
+        else {
+            response="Request Failed";
+            Log.e("PayBill", "response = " + response);
+        }
+        return response;
     }
 
     public static String exitGeoFence() throws IOException {
