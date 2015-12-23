@@ -44,7 +44,7 @@ exports.getFriendNearby= function(req,res,callback)
 
 	//Have to change query for getting friends nearby--Diksha
 
-	var query = client.query("select count(*) as count,u.friend_id, o.item_id as item_id, m.item_name as item_name, user_tbl.user_name as friend_name from user_connections_tbl as u, order_tbl as o, menu_item_tbl as m, user_tbl where o.user_id = u.friend_id and u.user_id = $1 and m.item_id = o.item_id and u.friend_id = user_tbl.user_id group by u.friend_id, o.item_id, m.item_name, user_tbl.user_name order by count desc;", [user_id]);
+	var query = client.query("select user_id as friend_id,user_name as friend_name,lat,lng from user_tbl where user_id in (select friend_id as user_id from user_connections_tbl where user_id = $1) and user_near= true", [user_id]);
 	query.on('row', function(row) {
 		console.log('Row received') ;
 		var item ={
