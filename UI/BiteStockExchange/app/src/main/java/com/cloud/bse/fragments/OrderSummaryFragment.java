@@ -81,7 +81,11 @@ public class OrderSummaryFragment extends Fragment {
 
                 PlaceOrder placeOrder = new PlaceOrder();
                 placeOrder.execute();
-                Toast.makeText(getActivity(), "Order Placed", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "A server will come to confirm your order", Toast.LENGTH_LONG).show();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                Fragment fragment = new MenuFragment();
+                transaction.replace(R.id.navigation_container, fragment);
+                transaction.commit();
             }
         });
 
@@ -167,6 +171,7 @@ public class OrderSummaryFragment extends Fragment {
             DataFactory.clearOrderSummaryItems();
             itemsAdapter.clear();
             itemsAdapter.notifyDataSetChanged();
+            DataFactory.setTotal_price();
             total_price.setText("Total Price: $0");
             if(pDialog.isShowing()) pDialog.dismiss();
         }

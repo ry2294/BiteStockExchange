@@ -122,6 +122,10 @@ public class DataFactory {
         return total_price;
     }
 
+    public static void setTotal_price() {
+        total_price = 0;
+    }
+
     public static void addItemToOrder(String itemId, String itemName, int itemPrice, int quantity, FragmentActivity fragmentActivity) {
         if(!orderSummaryItemHashMap.containsKey(itemId)) {
             Toast.makeText(fragmentActivity, "Item added to Kart", Toast.LENGTH_SHORT).show();

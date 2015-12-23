@@ -14,5 +14,5 @@ public class Constants {
     public static int IMAGE_WIDTH = 10;
     public static int IMAGE_LENGTH = 10;
 
-    public static String SERVER = "https://6760314b.ngrok.com";
+    public static String SERVER = "https://51af4b84.ngrok.com";
 }

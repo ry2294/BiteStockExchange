@@ -32,7 +32,6 @@ public class OrderHistoryFragment extends Fragment {
     private Button payBill;
     private ListView itemsListView;
     private ProgressDialog pDialog;
-    private TextView totalPrice;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,8 +42,7 @@ public class OrderHistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_order_history, container, false);
         pDialog = new ProgressDialog(getActivity());
-        totalPrice = (TextView) view.findViewById(R.id.order_summary_total_price);
-        totalPrice.setText(DataFactory.totalOrderPrice);
+        ((TextView) view.findViewById(R.id.order_history_total_price)).setText("Total Price: $" + DataFactory.totalOrderPrice);;
         payBill = (Button) view.findViewById(R.id.order_history_paybill_button);
         payBill.setOnClickListener(new View.OnClickListener() {
             @Override
