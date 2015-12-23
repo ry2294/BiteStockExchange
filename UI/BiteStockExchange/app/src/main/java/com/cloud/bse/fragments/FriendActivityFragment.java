@@ -46,7 +46,6 @@ public class FriendActivityFragment extends Fragment {
 
             FriendActivity activity = getItem(position);
             ((TextView) convertView.findViewById(R.id.friend_activity_name)).setText(activity.getName());
-            ((TextView) convertView.findViewById(R.id.friend_activity_activity)).setText(activity.getActivity());
 
             return convertView;
         }

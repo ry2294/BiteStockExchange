@@ -63,7 +63,7 @@ public class OrderSummaryFragment extends Fragment {
                     return;
                 }
                 if(!DataFactory.isInner()) {
-                    Toast.makeText(getActivity(), "Order can be placed inside Restaunrant Only", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(getActivity(), "Order can be placed inside Restaunrant Only", Toast.LENGTH_SHORT).show();
                     // return;
                 }
 
@@ -150,6 +150,10 @@ public class OrderSummaryFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void param) {
+            DataFactory.clearOrderSummaryItems();
+            itemsAdapter.clear();
+            itemsAdapter.notifyDataSetChanged();
+            total_price.setText("Total Price: $0");
             if(pDialog.isShowing()) pDialog.dismiss();
         }
     }

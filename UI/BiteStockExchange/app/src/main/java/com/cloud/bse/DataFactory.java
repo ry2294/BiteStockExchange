@@ -142,6 +142,10 @@ public class DataFactory {
         return orderSummaryItems;
     }
 
+    public static void clearOrderSummaryItems() {
+        orderSummaryItemHashMap.clear();
+    }
+
     public static void setUserInfo(String user_id, String user_name, Uri image) {
         DataFactory.user_id = user_id;
         DataFactory.user_name = user_name;
@@ -174,8 +178,8 @@ public class DataFactory {
                 response = new JSONArray(responseString);
                 for(int i=0; i < response.length(); i++) {
                     JSONObject activity = response.getJSONObject(i);
-                    FriendActivity friendActivity = new FriendActivity(activity.getString("friend_name"),
-                            "Ordered " + activity.getString("count") + " " + activity.getString("item_name"));
+                    FriendActivity friendActivity = new FriendActivity(activity.getString("friend_name") + " likes " + activity.getString("item_name"),
+                            activity.getString("count"));
                     friendActivities.add(friendActivity);
                 }
             }

@@ -12,11 +12,4 @@
         android:text="Rakesh Yarlagadda"
         android:textSize="20dp"/>
 
-    <TextView
-        android:id="@+id/friend_activity_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ordered Pizza"
-        android:textSize="20dp"/>
-
 </LinearLayout>

@@ -5,6 +5,7 @@
     >
 
     <TextView
+        android:visibility="invisible"
         android:text="Info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,6 +16,7 @@
         />
 
     <TextView
+        android:visibility="invisible"
         android:text="Latitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,6 +26,7 @@
         />
 
     <TextView
+        android:visibility="invisible"
         android:text="Longitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,6 +36,7 @@
         />
 
     <TextView
+        android:visibility="invisible"
         android:text="GCM Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,13 +44,6 @@
         android:layout_below="@+id/longitude_text"
         android:textSize="18sp"
         />
-
-    <Button
-        android:text="Start App"
-        android:id="@+id/start_app_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/gcm_text"/>
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/login_button"

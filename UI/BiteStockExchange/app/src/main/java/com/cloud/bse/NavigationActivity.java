@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cloud.bse.fragments.FriendActivityFragment;
 import com.cloud.bse.fragments.FriendInviteFragment;
@@ -117,7 +118,7 @@ public class NavigationActivity extends AppCompatActivity
             transaction.replace(R.id.navigation_container, fragment);
             transaction.commit();
         } else if (id == R.id.nav_share) {
-
+            Toast.makeText(this, "Sharing your experience in Facebook", Toast.LENGTH_SHORT).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
