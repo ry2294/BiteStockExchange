@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
 
         info = (TextView)findViewById(R.id.info);
         loginButton = (LoginButton)findViewById(R.id.login_button);
+        loginButton.setReadPermissions("user_friends");
         mLatitudeText = (TextView) findViewById((R.id.latitude_text));
         mLongitudeText = (TextView) findViewById((R.id.longitude_text));
 
@@ -196,6 +197,7 @@ public class MainActivity extends AppCompatActivity
                 DataFactory.registerUser();
                 DataFactory.fetchMenu();
                 DataFactory.fetchFriendActivity();
+                DataFactory.fetchFriendInvites();
                 // DataFactory.enterGeoFence("40.809435", "-73.959828");
                 // DataFactory.exitGeoFence();
             } catch (Exception e) {

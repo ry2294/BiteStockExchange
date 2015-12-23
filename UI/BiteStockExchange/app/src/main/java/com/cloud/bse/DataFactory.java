@@ -48,6 +48,7 @@ public class DataFactory {
     private static ArrayList<FriendInvite> friendInvites = new ArrayList<>();
     private static DataFactory ourInstance = new DataFactory();
     private static int total_price = 0;
+    public static FriendInvite friendInvite;
 
     public static DataFactory getInstance() {
         return ourInstance;
@@ -179,6 +180,31 @@ public class DataFactory {
                 }
             }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void fetchFriendInvites() throws IOException {
+        JSONArray response;
+        friendInvites.clear();
+        try {
+            URL url = new URL(Constants.SERVER + "/api/friend/invite/" + user_id);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            int responseCode = conn.getResponseCode();
+
+            if(responseCode == HttpURLConnection.HTTP_OK) {
+                String responseString = readStream(conn.getInputStream());
+                Log.v("FetchFriendInvites", responseString);
+                response = new JSONArray(responseString);
+                for (int i=0; i < response.length(); i++) {
+                    JSONObject invite = response.getJSONObject(i);
+                    FriendInvite friendInvite = new FriendInvite(invite.getString("friend_name"),
+                            invite.getString("friend_id"), new LatLng(Double.parseDouble(invite.getString("lat")),
+                            Double.parseDouble(invite.getString("lng"))));
+                    friendInvites.add(friendInvite);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -329,6 +355,44 @@ public class DataFactory {
         items = items.substring(0, items.length() - 1);
         items = "[" + items + "]";
         return items;
+    }
+
+    public static String inviteFriend() throws IOException {
+        String response = "";
+
+        URL url = new URL(Constants.SERVER + "/api/friend/invite");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+
+        OutputStream os = conn.getOutputStream();
+        BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(os, "UTF-8"));
+
+        HashMap<String, String> postDataParams = new HashMap<>();
+
+        postDataParams.put("friend_id", friendInvite.getFriendId());
+        postDataParams.put("user_name", user_name);
+
+        writer.write(getPostDataString(postDataParams));
+        writer.flush();
+        writer.close();
+        os.close();
+        int responseCode=conn.getResponseCode();
+        Log.e("PlaceOrder", "Getting Response");
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String line = "Request Success";
+            BufferedReader br=new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            while ((line=br.readLine()) != null) {
+                response+=line;
+            }
+        }
+        else {
+            response="Request Failed";
+        }
+        return response;
     }
 
     public static String placeOrder() throws IOException {

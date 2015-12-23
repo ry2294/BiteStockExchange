@@ -136,7 +136,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                     Log.e(TAG, "Inside Geo Outer with enter = " + enter);
                     Location location = geofencingEvent.getTriggeringLocation();
                     if (enter) DataFactory.enterGeoFence(String.valueOf(location.getLatitude()),
-                            String.valueOf(location.getLatitude()));
+                            String.valueOf(location.getLongitude()));
                     else DataFactory.exitGeoFence();
                 } catch (Exception e) {
                     Log.e(TAG, e.toString());
