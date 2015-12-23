@@ -339,8 +339,9 @@ exports.getBill = function(req,res,callback)
 { 
 	var bill_items = [];
 	var total_price = 0;
+	var user_id = req.params.user_id;
 	console.log('Connected to database');
-	var query = client.query("select menu_item_tbl.item_name as item_name, count(*) as count,sum(CAST(order_tbl.price as INTEGER))as price from order_tbl, menu_item_tbl where order_tbl.item_id = menu_item_tbl.item_id and user_id = '10153643333184718' and current_order = true group by menu_item_tbl.item_name;",[user_id]);
+	var query = client.query("select menu_item_tbl.item_name as item_name, count(*) as count,sum(CAST(order_tbl.price as INTEGER))as price from order_tbl, menu_item_tbl where order_tbl.item_id = menu_item_tbl.item_id and user_id = $1 and current_order = true group by menu_item_tbl.item_name;",[user_id]);
 	query.on('row', function(row) {
 		console.log('Row received') ;
 
@@ -372,7 +373,7 @@ exports.payBill = function(req,res,callback)
 	var queryToUpdatePrice = client.query("update order_tbl set current_order = false where user_id = $1",[user_id]);
 	queryToUpdatePrice.on('end', function(result){
 		res.status(200);
-        res.json({"order_id" : order_id});
+        res.json({message:"Bill_confirmed"});
         callback(res);
 	});	
 
