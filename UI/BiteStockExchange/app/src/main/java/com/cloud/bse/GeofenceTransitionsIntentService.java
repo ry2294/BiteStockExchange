@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -61,7 +62,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
                     this,
                     geofenceTransition,
                     triggeringGeofences,
-                    (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) ? true : false
+                    (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) ? true : false,
+                    geofencingEvent
             );
 
             // Send notification and log the transition details.
@@ -116,15 +118,31 @@ public class GeofenceTransitionsIntentService extends IntentService {
     private String getGeofenceTransitionDetails(
             Context context,
             int geofenceTransition,
-            List<Geofence> triggeringGeofences, boolean enter) {
+            List<Geofence> triggeringGeofences, boolean enter,
+            GeofencingEvent geofencingEvent) {
 
         String geofenceTransitionString = getTransitionString(geofenceTransition);
 
         // Get the Ids of each geofence that was triggered.
         ArrayList triggeringGeofencesIdsList = new ArrayList();
         for (Geofence geofence : triggeringGeofences) {
+            Log.e(TAG, "Inside Geo Trigger = " + enter);
+
             if(geofence.getRequestId().equals(Constants.GEO_INNER)) DataFactory.setInner(enter);
-            if(geofence.getRequestId().equals(Constants.GEO_OUTER)) DataFactory.setOuter(enter);
+            if(geofence.getRequestId().equals(Constants.GEO_OUTER) && enter) DataFactory.setInner(enter);
+
+            if(geofence.getRequestId().equals(Constants.GEO_OUTER)) {
+                try {
+                    Log.e(TAG, "Inside Geo Outer with enter = " + enter);
+                    Location location = geofencingEvent.getTriggeringLocation();
+                    if (enter) DataFactory.enterGeoFence(String.valueOf(location.getLatitude()),
+                            String.valueOf(location.getLatitude()));
+                    else DataFactory.exitGeoFence();
+                } catch (Exception e) {
+                    Log.e(TAG, e.toString());
+                }
+                DataFactory.setOuter(enter);
+            }
             triggeringGeofencesIdsList.add(geofence.getRequestId());
         }
         String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);

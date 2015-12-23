@@ -166,7 +166,7 @@ exports.userEnter = function(req,res,callback)
 	console.log('Connected to database');
 	console.log('User id' + req.body.user_id);
 
-	var queryToUpdateFence = client.query("update user_tbl set lat = $1,lng = $2,user_near = 1 where user_id = $3",[lat, lng, user_id]);
+	var queryToUpdateFence = client.query("update user_tbl set lat = $1,lng = $2,user_near = true where user_id = $3",[lat, lng, user_id]);
 	queryToUpdateFence.on('end', function(result)
 	{					
 
@@ -187,7 +187,7 @@ exports.userExit = function(req,res,callback)
 	console.log('Connected to database');
 	console.log('User id' + req.body.user_id);
 
-	var queryToUpdateFence = client.query("update user_tbl set lat = 0, lng = 0, user_near = 0 where user_id = $1",[user_id]);
+	var queryToUpdateFence = client.query("update user_tbl set user_near = false where user_id = $1",[user_id]);
 	queryToUpdateFence.on('end', function(result)
 	{					
 

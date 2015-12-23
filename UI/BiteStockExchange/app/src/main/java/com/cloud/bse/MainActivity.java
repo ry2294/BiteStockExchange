@@ -72,6 +72,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        pDialog = new ProgressDialog(this);
+
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_main);
@@ -116,8 +119,6 @@ public class MainActivity extends AppCompatActivity
                 profile = Profile.getCurrentProfile();
                 info.setText("access Token = " + (accessToken != null ? accessToken.getUserId() : null));
                 DataFactory.setFb_token(loginResult.getAccessToken().getToken());
-                // RegisterUser registerUser = new RegisterUser();
-                // registerUser.execute();
             }
 
             @Override
@@ -131,13 +132,17 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        if(profile != null) {
-            InvokeNavigation(profile.getId(), profile.getName(), profile.getProfilePictureUri(Constants.IMAGE_WIDTH, Constants.IMAGE_LENGTH));
-        }
-
         mGeofenceList.add(new Geofence.Builder()
                 .setRequestId(Constants.GEO_INNER)
-                .setCircularRegion(Constants.LATITUDE, Constants.LONGITUDE, 25)
+                .setCircularRegion(Constants.LATITUDE, Constants.LONGITUDE, Constants.INNER_RADIUS)
+                .setExpirationDuration(Long.MAX_VALUE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                        Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build());
+
+        mGeofenceList.add(new Geofence.Builder()
+                .setRequestId(Constants.GEO_OUTER)
+                .setCircularRegion(Constants.LATITUDE, Constants.LONGITUDE, Constants.OUTER_RADIUS)
                 .setExpirationDuration(Long.MAX_VALUE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
                         Geofence.GEOFENCE_TRANSITION_EXIT)
@@ -147,10 +152,6 @@ public class MainActivity extends AppCompatActivity
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
         builder.addGeofences(mGeofenceList);
         geofencingRequest = builder.build();
-
-        Intent geoFenceIntent = new Intent(this, GeofenceTransitionsIntentService.class);
-
-        mGeofencePendingIntent = PendingIntent.getService(this, 0, geoFenceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         gcmText = (TextView) findViewById(R.id.gcm_text);
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -167,6 +168,10 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
+
+        if(profile != null) {
+            InvokeNavigation(profile.getId(), profile.getName(), profile.getProfilePictureUri(Constants.IMAGE_WIDTH, Constants.IMAGE_LENGTH));
+        }
     }
 
     private void invokeGCM(String topic) {
@@ -180,6 +185,9 @@ public class MainActivity extends AppCompatActivity
     private class RegisterUser extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
         }
 
         @Override
@@ -187,6 +195,9 @@ public class MainActivity extends AppCompatActivity
             try {
                 DataFactory.registerUser();
                 DataFactory.fetchMenu();
+                DataFactory.fetchFriendActivity();
+                // DataFactory.enterGeoFence("40.809435", "-73.959828");
+                // DataFactory.exitGeoFence();
             } catch (Exception e) {
                 publishProgress("Failed to Register user. Exception = " + e.toString());
                 Log.e("Registration", e.toString());
@@ -201,15 +212,36 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(Void param) {
+            if(pDialog.isShowing()) pDialog.dismiss();
+            StartNavigation();
         }
     }
 
     public void InvokeNavigation(String user_id, String user_name, Uri image) {
         DataFactory.setUserInfo(user_id, user_name, image);
-//        pDialog = new ProgressDialog(getApplicationContext());
-//        pDialog.show();
-        //Intent intent = new Intent(this, NavigationActivity.class);
-        //startActivity(intent);
+        DataFactory.setFb_token(accessToken.getToken());
+        RegisterUser registerUser = new RegisterUser();
+        registerUser.execute();
+    }
+
+    public void StartNavigation() {
+        Intent geoFenceIntent = new Intent(this, GeofenceTransitionsIntentService.class);
+        mGeofencePendingIntent = PendingIntent.getService(this, 0, geoFenceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        try {
+            LocationServices.GeofencingApi.addGeofences(
+                    mGoogleApiClient,
+                    // The GeofenceRequest object.
+                    geofencingRequest,
+                    // A pending intent that that is reused when calling removeGeofences(). This
+                    // pending intent is used to generate an intent when a matched geofence
+                    // transition is observed.
+                    mGeofencePendingIntent
+            ).setResultCallback(this); // Result processed in onResult().
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
+        Intent intent = new Intent(this, NavigationActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -235,25 +267,12 @@ public class MainActivity extends AppCompatActivity
             mLongitudeText.setText("No location detected");
             Toast.makeText(this, "No location detected", Toast.LENGTH_LONG).show();
         }
-
-        try {
-            LocationServices.GeofencingApi.addGeofences(
-                    mGoogleApiClient,
-                    // The GeofenceRequest object.
-                    geofencingRequest,
-                    // A pending intent that that is reused when calling removeGeofences(). This
-                    // pending intent is used to generate an intent when a matched geofence
-                    // transition is observed.
-                    mGeofencePendingIntent
-            ).setResultCallback(this); // Result processed in onResult().
-        } catch (Exception e) {
-
-        }
     }
 
+    @Override
     public void onResult(Status status) {
         if (status.isSuccess()) {
-            Toast.makeText(this, "Added Geo Fence", Toast.LENGTH_LONG);
+            // Toast.makeText(this, "Added Geo Fence", Toast.LENGTH_LONG).show();
             Log.e(TAG, "Success Status Code = " + status.getStatusCode());
         } else {
             Log.e(TAG, "Error Status Code = " + status.getStatusCode());

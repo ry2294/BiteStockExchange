@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.cloud.bse.DataFactory;
 import com.cloud.bse.R;
 import com.cloud.bse.model.FriendActivity;
 
@@ -24,11 +25,8 @@ public class FriendActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friendactivity, container, false);
 
-        ArrayList<FriendActivity> friendActivities = new ArrayList<>();
-        friendActivities.add(new FriendActivity("Rakesh Yarlagadda", "Ordered Pizza and Pasta"));
-
         ListView friendActivitiesListView = (ListView) view.findViewById(R.id.friend_activity_listview);
-        activityAdapter = new ActivityAdapter(friendActivities);
+        activityAdapter = new ActivityAdapter(DataFactory.getFriendActivities());
         friendActivitiesListView.setAdapter(activityAdapter);
 
         return view;

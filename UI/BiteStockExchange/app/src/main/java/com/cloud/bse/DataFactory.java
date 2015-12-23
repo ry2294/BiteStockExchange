@@ -1,10 +1,12 @@
 package com.cloud.bse;
 
+import android.location.Location;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.cloud.bse.model.FriendActivity;
 import com.cloud.bse.model.FriendInvite;
 import com.cloud.bse.model.MenuItem;
 import com.cloud.bse.model.OrderSummaryItem;
@@ -35,6 +37,7 @@ import java.util.Map;
 public class DataFactory {
     private static HashMap<String, OrderSummaryItem> orderSummaryItemHashMap = new HashMap<>();
     private static HashMap<String, MenuItem> menuItemHashMap = new HashMap<>();
+    private static ArrayList<FriendActivity> friendActivities = new ArrayList<>();
     private static String user_id;
     private static String user_name;
     private static String fb_token;
@@ -156,8 +159,38 @@ public class DataFactory {
         return DataFactory.image;
     }
 
+    public static void fetchFriendActivity() throws IOException {
+        JSONArray response;
+        friendActivities.clear();
+        try {
+            URL url = new URL(Constants.SERVER + "/api/friend/activity/" + user_id);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            int responseCode = conn.getResponseCode();
+
+            if(responseCode == HttpURLConnection.HTTP_OK) {
+                String responseString = readStream(conn.getInputStream());
+                Log.v("FetchFriendActivity", responseString);
+                response = new JSONArray(responseString);
+                for(int i=0; i < response.length(); i++) {
+                    JSONObject activity = response.getJSONObject(i);
+                    FriendActivity friendActivity = new FriendActivity(activity.getString("friend_name"),
+                            "Ordered " + activity.getString("count") + " " + activity.getString("item_name"));
+                    friendActivities.add(friendActivity);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<FriendActivity> getFriendActivities() {
+        return friendActivities;
+    }
+
     public static void fetchMenu() throws IOException {
         JSONArray response;
+        menuItemHashMap.clear();
         try {
             URL url = new URL(Constants.SERVER + "/api/menu");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -165,7 +198,7 @@ public class DataFactory {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String responseString = readStream(conn.getInputStream());
-                Log.v("CatalogClient", responseString);
+                Log.v("FetchMenu", responseString);
                 response = new JSONArray(responseString);
                 Log.e("fetchMenu", response.toString());
                 for(int i = 0; i < response.length(); i++) {
@@ -206,27 +239,30 @@ public class DataFactory {
         return response.toString();
     }
 
-    public static String registerUser() throws IOException {
+    public static String exitGeoFence() throws IOException {
         String response = "";
+        URL url = new URL(Constants.SERVER + "/api/user/exit");
 
-        URL url = new URL(Constants.SERVER + "/api/user/register");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setDoInput(true);
         conn.setDoOutput(true);
+        Log.e("ExitGeoFence", "Openning connection");
 
         OutputStream os = conn.getOutputStream();
         BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(os, "UTF-8"));
-        HashMap<String, String> postDataParams = new HashMap<>();
-        postDataParams.put("user_id", user_id);
-        postDataParams.put("fb_token", fb_token);
-        writer.write(getPostDataString(postDataParams));
 
+        HashMap<String, String> postDataParams = new HashMap<>();
+        Log.e("ExitGeoFence", "user_id = " + user_id);
+        postDataParams.put("user_id", user_id);
+        Log.e("ExitGeoFence", "Before flushing Response");
+        writer.write(getPostDataString(postDataParams));
         writer.flush();
         writer.close();
         os.close();
         int responseCode=conn.getResponseCode();
+        Log.e("ExitGeoFence", "Getting Response");
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
             String line = "Request Success";
@@ -238,7 +274,147 @@ public class DataFactory {
         else {
             response="Request Failed";
         }
+        return response;
+    }
 
+    public static String enterGeoFence(String lat, String lng) throws IOException {
+        String response = "";
+        URL url = new URL(Constants.SERVER + "/api/user/enter");
+
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+        Log.e("EnterGeoFence", "Openning connection");
+
+        OutputStream os = conn.getOutputStream();
+        BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(os, "UTF-8"));
+
+        HashMap<String, String> postDataParams = new HashMap<>();
+        Log.e("EnterGeoFence", "user_id = " + user_id);
+        Log.e("EnterGeoFence", "fb_token = " + fb_token);
+        postDataParams.put("user_id", user_id);
+        postDataParams.put("lat", lat);
+        postDataParams.put("lng", lng);
+        Log.e("EnterGeoFence", "Before flushing Response");
+        writer.write(getPostDataString(postDataParams));
+        writer.flush();
+        writer.close();
+        os.close();
+        int responseCode=conn.getResponseCode();
+        Log.e("EnterGeoFence", "Getting Response");
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String line = "Request Success";
+            BufferedReader br=new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            while ((line=br.readLine()) != null) {
+                response+=line;
+            }
+        }
+        else {
+            response="Request Failed";
+        }
+        return response;
+    }
+
+    public static String convertItems() {
+        String items = "";
+        for(OrderSummaryItem orderSummaryItem : getOrderSummaryItems()) {
+            for(int i = 1; i <= orderSummaryItem.getQuantity(); i++) {
+                items+= "{\"item_id\": \"" + orderSummaryItem.getItemId()
+                        + "\", \"price\": \"" + orderSummaryItem.getItemPrice() + "\"},";
+            }
+        }
+        items = items.substring(0, items.length() - 1);
+        items = "[" + items + "]";
+        return items;
+    }
+
+    public static String placeOrder() throws IOException {
+        String response = "";
+        Log.e("PlaceOrder", "Before Openning connection");
+
+        URL url = new URL(Constants.SERVER + "/api/menu/order");
+
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+        Log.e("PlaceOrder", "Openning connection");
+
+        OutputStream os = conn.getOutputStream();
+        BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(os, "UTF-8"));
+
+        HashMap<String, String> postDataParams = new HashMap<>();
+        Log.e("PlaceOrder", "user_id = " + user_id);
+        postDataParams.put("user_id", user_id);
+
+        Log.e("PlaceOrder", "user_id = " + user_id);
+        postDataParams.put("order_summary", convertItems());
+
+        Log.e("PlaceOrder", "Before flushing Response");
+        writer.write(getPostDataString(postDataParams));
+        writer.flush();
+        writer.close();
+        os.close();
+        int responseCode=conn.getResponseCode();
+        Log.e("PlaceOrder", "Getting Response");
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String line = "Request Success";
+            BufferedReader br=new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            while ((line=br.readLine()) != null) {
+                response+=line;
+            }
+        }
+        else {
+            response="Request Failed";
+        }
+        return response;
+    }
+
+    public static String registerUser() throws IOException {
+
+        String response = "";
+        Log.e("Registration", "Before Openning connection");
+
+        URL url = new URL(Constants.SERVER + "/api/user/register");
+
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+        Log.e("Registration", "Openning connection");
+
+        OutputStream os = conn.getOutputStream();
+        BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(os, "UTF-8"));
+
+        HashMap<String, String> postDataParams = new HashMap<>();
+        Log.e("Registration", "user_id = " + user_id);
+        Log.e("Registration", "fb_token = " + fb_token);
+        postDataParams.put("user_id", user_id);
+        postDataParams.put("fb_token", fb_token);
+        Log.e("Registration", "Before flushing Response");
+        writer.write(getPostDataString(postDataParams));
+        writer.flush();
+        writer.close();
+        os.close();
+        int responseCode=conn.getResponseCode();
+        Log.e("Registration", "Getting Response");
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String line = "Request Success";
+            BufferedReader br=new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            while ((line=br.readLine()) != null) {
+                response+=line;
+            }
+        }
+        else {
+            response="Request Failed";
+        }
         return response;
     }
 

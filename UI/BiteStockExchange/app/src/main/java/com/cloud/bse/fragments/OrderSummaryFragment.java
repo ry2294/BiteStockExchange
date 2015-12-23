@@ -1,7 +1,10 @@
 package com.cloud.bse.fragments;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +29,7 @@ public class OrderSummaryFragment extends Fragment {
     private ListView itemsListView;
     private Button placeOrderButton;
     private TextView total_price;
+    private ProgressDialog pDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,8 @@ public class OrderSummaryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_ordersummary, container, false);
+
+        pDialog = new ProgressDialog(getActivity());
 
         Spinner table = (Spinner) view.findViewById(R.id.table_number_spinner);
         String[] items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
@@ -58,8 +64,12 @@ public class OrderSummaryFragment extends Fragment {
                 }
                 if(!DataFactory.isInner()) {
                     Toast.makeText(getActivity(), "Order can be placed inside Restaunrant Only", Toast.LENGTH_SHORT).show();
-                    return;
+                    // return;
                 }
+
+                PlaceOrder placeOrder = new PlaceOrder();
+                placeOrder.execute();
+                Toast.makeText(getActivity(), "Order Placed", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -112,6 +122,35 @@ public class OrderSummaryFragment extends Fragment {
                 }
             });
             return convertView;
+        }
+    }
+
+    private class PlaceOrder extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            pDialog.setMessage("Placing order...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... param) {
+            try {
+                DataFactory.placeOrder();
+            } catch (Exception e) {
+                publishProgress("Failed to place order. Exception = " + e.toString());
+                Log.e("PlaceOrder", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... param) {
+        }
+
+        @Override
+        protected void onPostExecute(Void param) {
+            if(pDialog.isShowing()) pDialog.dismiss();
         }
     }
 }
