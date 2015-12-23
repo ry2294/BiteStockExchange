@@ -163,6 +163,22 @@ router.route('/menu')
           console.log("Request handled; Menu Returned");
       }
     });
+router.route('/menu/bill/:user_id')
+
+    // get the student with that id (accessed at GET http://localhost:16386/api/student/:student_id)
+    .get(function(req, res) {
+      // Logic to show student here
+      db.getBill(req,res,handleResult);
+      function handleResult(response, err){
+          if(err)
+          {
+            console.error(err.stack || err.message);
+            return;
+          }
+          res.json(response.body);
+          console.log("Request handled; Bill Returned");
+      }
+    });
     
 router.route('/menu/order')
 
@@ -178,6 +194,22 @@ router.route('/menu/order')
     }
   }
 });
+
+  router.route('/menu/pay')
+
+  .post(function(req, res) {
+  db.payBill(req, res, handleResult);
+  function handleResult(response){
+    console.log('Callback received');
+    console.log("Status code " +response.statusCode);
+    if(response.statusCode == 200){
+      console.log('200');
+      res.status(200);
+      res.json({ message: 'Bill Payment confirmed!', returnStatus : '200'});
+    }
+  }
+});
+
 
 
 // REGISTER OUR ROUTES -------------------------------

@@ -1,5 +1,6 @@
 var pg = require('pg');
 var fb = require('./fb_api.js');
+var consts = require('./Constants.js');
 
 
 var connectionString = 'postgres://postgres:postgres@localhost:5432/bse_db';
@@ -227,6 +228,75 @@ exports.getMenuItems = function(req,res,callback)
 
 //Order placing and logic for handling prices post a single order
 
+
+
+/*//gets  called based on time
+exports.updatePrice()
+{
+var time_factor = 1.0;
+var date = new Date();
+var current_hour = date.getHours();
+var highest_price;
+var lowest_price;
+var current_high_price;
+var current_low_price;
+
+//update for each item
+//fetch base highest and lowest from db
+if(day == 5)
+{
+	if(current_hour>= 12 && current_hour < 18)
+		{
+			time_factor = Constants.FRIDAY_AFTERNOON;
+		}
+	else if(current_hour >= 16 & current_hour < 23)
+	    {
+	 		time_factor = Constants.FRIDAY_EVENING;
+        }
+}
+else if(day == 6)
+{
+	if(current_hour>= 12 && current_hour < 18)
+		{
+			time_factor = Constants.SATURDAY_AFTERNOON;
+		}
+	else if(current_hour >= 16 & current_hour < 23)
+	    {
+	 		time_factor = Constants.SATURDAY_EVENING;
+        }
+}
+else if(day == 7)
+{
+	if(current_hour>= 12 && current_hour < 18)
+		{
+			time_factor = Constants.SUNDAY_AFTERNOON;
+		}
+	else if(current_hour >= 16 & current_hour < 23)
+	    {
+	 		time_factor = Constants.SUNDAY_EVENING;
+        }
+}
+else
+
+time_factor = Constants.DEFAULT;
+
+current_high_price = time_factor * current_high_price;
+current_low_price = time_factor * current_low_price;
+
+if(current_high_price > highest_price)
+	current_high_price = highest_price;
+
+if(current_low_price < lowest_price)
+	current_low_price = lowest_price;
+
+//update price in db
+
+}
+*/
+
+
+
+
 exports.addOrder = function(req,res,callback)
 {
 	var order_id = Math.floor((Math.random() * 10000000) + 1);
@@ -243,7 +313,8 @@ exports.addOrder = function(req,res,callback)
 		   count++;
 		   var	item_id = array[j].item_id;
 		   var price = array[j].price;
-		   var query = client.query("insert into order_tbl(item_id,price,user_id,order_id) values($1,$2,$3,$4)", [item_id,price,user_id,order_id]);
+		   var status = 'true';
+		   var query = client.query("insert into order_tbl(item_id,price,user_id,order_id,current_order) values($1,$2,$3,$4,$5)", [item_id,price,user_id,order_id,status]);
 		   query.on('end', function(result) {
 				var queryToUpdateCount = client.query("update menu_item_tbl set order_count = i.order_count + 1 from (select order_count from menu_item_tbl where item_id = $1)i where item_id = $2",[item_id, item_id]);
 				queryToUpdateCount.on('end', function(result)
@@ -262,3 +333,49 @@ exports.addOrder = function(req,res,callback)
 			});
 	}
 }
+
+
+exports.getBill = function(req,res,callback)
+{ 
+	var bill_items = [];
+	var total_price = 0;
+	console.log('Connected to database');
+	var query = client.query("select menu_item_tbl.item_name as item_name, count(*) as count,sum(CAST(order_tbl.price as INTEGER))as price from order_tbl, menu_item_tbl where order_tbl.item_id = menu_item_tbl.item_id and user_id = '10153643333184718' and current_order = true group by menu_item_tbl.item_name;",[user_id]);
+	query.on('row', function(row) {
+		console.log('Row received') ;
+
+		var item =	{
+					item_name : row.item_name, 
+					count : row.count, 
+					price : row.price
+					};
+
+					total_price = total_price + row.price;
+					bill_items.push(item);
+	});
+	query.on('end', function(row) {
+		message = {"items" : bill_items, "total_price" : total_price};
+		res.status(200).json(message);
+		callback(res);
+	});
+}
+
+
+exports.payBill = function(req,res,callback)
+{
+	//var order_id = Math.floor((Math.random() * 10000000) + 1);
+	//order_id = order_id + '';
+	var user_id = req.body.user_id;
+	console.log('Connected to database');
+	console.log('User id' + req.body.user_id);				
+
+	var queryToUpdatePrice = client.query("update order_tbl set current_order = false where user_id = $1",[user_id]);
+	queryToUpdatePrice.on('end', function(result){
+		res.status(200);
+        res.json({"order_id" : order_id});
+        callback(res);
+	});	
+
+
+}
+
